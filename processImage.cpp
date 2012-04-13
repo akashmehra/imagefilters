@@ -34,9 +34,12 @@ int main(int argc, char* argv[])
     gpu::ImageProcessing<unsigned char> imp;
     imp.unroll(image,imgInfo.width,imgInfo.height,imgInfo.spectrum,buffer);
     
-    CImg<unsigned char> outputImage(buffer,imgInfo.width,imgInfo.height,1,imgInfo.spectrum,0);
     //CImg<unsigned char> outputImage(imgInfo.width,imgInfo.height,1,imgInfo.spectrum);
-    imp.displayReshapedImage(image,imgInfo,&outputImage);
+    unsigned char (gpu::BrightnessFilter<unsigned char>::*brightnessPtr)(const unsigned char&) = NULL;
+    gpu::BrightnessFilter<unsigned char> bFilter(1.2);
+    //    brightnessPtr = bFilter.apply;
+    imp.applyFilter(image,imgInfo,buffer,&bFilter);
+    CImg<unsigned char> outputImage(buffer,imgInfo.width,imgInfo.height,1,imgInfo.spectrum,0);
     double dTime2 = gpu::getTime(tim);
     std::cout << "time taken for unrolled version: " << dTime2 - dTime1 << std::endl;
 

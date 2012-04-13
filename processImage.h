@@ -14,38 +14,50 @@ namespace gpu
 {
 
   template<typename T>
-  struct Filters
+  struct ContrastFilter
   {
-    static T contrast(float cValue,
-			 const T& pixel);
-    static T brightness(const float bValue,const T&pixel);
+  private:
+    T pixelDictionary[256];
+  public:
+    ContrastFilter(float cValue)
+    {
+      for(int i=0;i<256;++i)
+      {
+	if(cValue > 1)
+	{
+	  float diff = cValue - 1;
+	  cValue = 1 + diff/2;
+	}
+	int val = (int)((float)i*cValue + (-cValue*128 + 128));   
+	if(val < 0) val = 0;
+	if(val > 255) val = 255;
+	pixelDictionary[i] = val;
+      }
+    }
+    T apply(const T& pixel) {return pixelDictionary[pixel];}
+
   };
   
+
   template<typename T>
-  T Filters<T>::contrast(float cValue,
-			      const T& pixel)
+  struct BrightnessFilter
   {
-    if(cValue > 1)
+  private:
+    T pixelDictionary[256];
+  public:
+    BrightnessFilter(float cValue)
     {
-      float diff = cValue - 1;
-      cValue = 1 + diff/2;
+      for(int i=0;i<256;++i)
+      {
+	int val = (int)(i*cValue);
+	if(val < 0) val = 0;
+	if(val > 255) val = 255;
+	pixelDictionary[i] = val;
+      }
     }
-    int pixelValue = (int)((float)pixel*cValue + (-cValue*128 + 128));   
-    if(pixelValue < 0) pixelValue = 0;
-    if(pixelValue > 255) pixelValue = 255;
-    return pixelValue;
-  }
+    T apply(const T& pixel) {return pixelDictionary[pixel];}
 
-    template<typename T>
-  T Filters<T>::brightness(float cValue,
-			      const T& pixel)
-  {
-    int pixelValue = (int)(pixel*cValue);
-    if(pixelValue < 0) pixelValue = 0;
-    if(pixelValue > 255) pixelValue = 255;
-    return pixelValue;
-  }
-
+  };
 
   int diff_ms(timeval t1, timeval t2)
   {
@@ -82,9 +94,18 @@ namespace gpu
   class ImageProcessing
   {
     public:
-    void displayReshapedImage(const CImg<T>& image,
-			      const Image& imgInfo,
-			      CImg<T>* destinationImage);
+    void applyFilter(const CImg<T>& image,
+		     const Image& imgInfo,
+		     CImg<T>* destinationImage,
+		     BrightnessFilter<T>* filterObject
+		     );
+    
+    void applyFilter(const CImg<T>& image,
+		     const Image& imgInfo,
+		     T* buffer,
+		     BrightnessFilter<T>* filterObject
+		     );
+    
     void unroll(CImg<T>& image, 
 		unsigned int width,
 		unsigned int height,
@@ -93,9 +114,10 @@ namespace gpu
   };
   
   template <typename T>
-  void ImageProcessing<T>::displayReshapedImage(const CImg<T>& image,
-			  const Image& imgInfo,
-			  CImg<T>* destinationImage)
+  void ImageProcessing<T>::applyFilter(const CImg<T>& image,
+				       const Image& imgInfo,
+				       CImg<T>* destinationImage,
+				       BrightnessFilter<T>* filterObject)
     {
       for(int row = 0; row < imgInfo.width; ++row)
       {
@@ -103,12 +125,33 @@ namespace gpu
 	{
 	  for(int channel = 0; channel < imgInfo.spectrum ; ++channel)
 	  {
-	    destinationImage->atXYZ(row,col,0,channel) = Filters<unsigned char>::contrast(1.5,image(row,col,0,channel));
-	    destinationImage->atXYZ(row,col,0,channel) = Filters<unsigned char>::brightness(1.1,destinationImage->atXYZ(row,col,0,channel));
+	    destinationImage->atXYZ(row,col,0,channel) = filterObject->apply(image(row,col,0,channel));
+	    // destinationImage->atXYZ(row,col,0,channel) = Filters<unsigned char>::brightness(1.1,destinationImage->atXYZ(row,col,0,channel));
 	  }
 	}
       }
     }
+  
+  template <typename T>
+  void ImageProcessing<T>::applyFilter(const CImg<T>& image,
+				       const Image& imgInfo,
+				       T* buffer,
+				       BrightnessFilter<T>* filterObject)
+    {
+      for(int channel = 0; channel < imgInfo.spectrum ; ++channel)
+      {
+	for(int j = 0; j < imgInfo.width; ++j)
+	{
+	  for(int i = 0; i < imgInfo.height; ++i)
+	  {
+	    int k = channel*imgInfo.width*imgInfo.height +  i * imgInfo.width + j;
+	    buffer[k] = filterObject->apply(image(j,i,0,channel));
+	  }
+	}
+      }
+    }
+  
+  
   template <typename T>
   void ImageProcessing<T>::unroll(CImg<T>& image, 
 			       unsigned int width,

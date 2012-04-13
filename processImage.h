@@ -13,6 +13,40 @@ using namespace cimg_library;
 namespace gpu
 {
 
+  template<typename T>
+  struct Filters
+  {
+    static T contrast(float cValue,
+			 const T& pixel);
+    static T brightness(const float bValue,const T&pixel);
+  };
+  
+  template<typename T>
+  T Filters<T>::contrast(float cValue,
+			      const T& pixel)
+  {
+    if(cValue > 1)
+    {
+      float diff = cValue - 1;
+      cValue = 1 + diff/2;
+    }
+    int pixelValue = (int)((float)pixel*cValue + (-cValue*128 + 128));   
+    if(pixelValue < 0) pixelValue = 0;
+    if(pixelValue > 255) pixelValue = 255;
+    return pixelValue;
+  }
+
+    template<typename T>
+  T Filters<T>::brightness(float cValue,
+			      const T& pixel)
+  {
+    int pixelValue = (int)(pixel*cValue);
+    if(pixelValue < 0) pixelValue = 0;
+    if(pixelValue > 255) pixelValue = 255;
+    return pixelValue;
+  }
+
+
   int diff_ms(timeval t1, timeval t2)
   {
     return (((t1.tv_sec - t2.tv_sec) * MILLION) + 
@@ -69,7 +103,8 @@ namespace gpu
 	{
 	  for(int channel = 0; channel < imgInfo.spectrum ; ++channel)
 	  {
-	    destinationImage->atXYZ(row,col,0,channel) = image(row,col,0,0)>>1;
+	    destinationImage->atXYZ(row,col,0,channel) = Filters<unsigned char>::contrast(1.5,image(row,col,0,channel));
+	    destinationImage->atXYZ(row,col,0,channel) = Filters<unsigned char>::brightness(1.1,destinationImage->atXYZ(row,col,0,channel));
 	  }
 	}
       }

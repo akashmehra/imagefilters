@@ -5,6 +5,5 @@ ENABLE_LANGUAGE(CXX)
 file(GLOB HEADERS "*.h")
 add_library(ProcessImage STATIC processImage.cpp ${HEADERS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -L/usr/X11R6/lib -lm -lpthread -lX11")
-add_executable(pimage processImage.cpp)
-target_link_libraries(pimage ProcessImage)
+#add_executable(pimage processImage.cpp)
 

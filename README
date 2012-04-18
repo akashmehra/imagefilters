@@ -1,2 +1,21 @@
-Compile by issuing the following command:
+If you don't have cmake installed then compile by issuing the following command:
 	g++ -o pimg processImage.cpp -O3 -L/usr/X11R6/lib -lm -lpthread -lX11
+
+else:
+	for building out of source:
+	In Release mode:
+		mkdir -p build/release
+		cd build/release
+		cmake -DCMAKE_BUILD_TYPE=Release ../../
+		make
+	
+	In Debug mode:
+		mkdir -p build/debug
+		cd build/debug
+		cmake ../../
+		make
+
+For using Xcode:
+	cmake -GXcode ../../
+
+but have to test if it works with Xcode just like that.

@@ -27241,13 +27241,13 @@ namespace cimg_library {
         by = 3*(y1 - y0) - 2*v0 - v1,
         _precision = 1/(std::sqrt(cimg::sqr(x0-x1)+cimg::sqr(y0-y1))*(precision>0?precision:1));
       int ox = x0, oy = y0, otx = tx0, oty = ty0;
-      for (float t = 0; t<1; t+=_precision) {
-        const float t2 = t*t, t3 = t2*t;
+      for (float tf= 0; tf<1; tf+=_precision) {
+        const float t2 = tf*tf, t3 = t2*tf;
         const int
-          nx = (int)(ax*t3 + bx*t2 + u0*t + x0),
-          ny = (int)(ay*t3 + by*t2 + v0*t + y0),
-          ntx = tx0 + (int)((tx1-tx0)*t),
-          nty = ty0 + (int)((ty1-ty0)*t);
+          nx = (int)(ax*t3 + bx*t2 + u0*tf + x0),
+          ny = (int)(ay*t3 + by*t2 + v0*tf + y0),
+          ntx = tx0 + (int)((tx1-tx0)*tf),
+          nty = ty0 + (int)((ty1-ty0)*tf);
         draw_line(ox,oy,nx,ny,texture,otx,oty,ntx,nty,opacity,pattern,ninit_hatch);
         ninit_hatch = false;
         ox = nx; oy = ny; otx = ntx; oty = nty;

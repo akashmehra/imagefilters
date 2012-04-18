@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>imagefiltersXcode.xcscheme</key>
+		<key>ImageProcessingFilters.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
@@ -12,7 +12,7 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>082C57DF153F4A9400B4A3E6</key>
+		<key>08E73C26153F7E1000A04613</key>
 		<dict>
 			<key>primary</key>
 			<true/>

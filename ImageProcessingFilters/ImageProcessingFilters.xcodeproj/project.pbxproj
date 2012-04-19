@@ -202,6 +202,7 @@
 		08E73C32153F7E1000A04613 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/X11/lib,
@@ -223,6 +224,7 @@
 		08E73C33153F7E1000A04613 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/X11/lib,

@@ -12,6 +12,25 @@ using namespace cimg_library;
 
 namespace gpu
 {
+  template <typename T>
+  static  void unroll(CImg<T>& image, unsigned int width, unsigned int height,
+                      unsigned int spectrum, T* buffer)
+  {
+    {
+      for(unsigned int k = 0;k<spectrum;++k)
+      {
+        for(unsigned int j=0;j<height;++j)
+        {
+          for(int i=0;i<width;++i)
+          {
+            buffer[k*height*width+j*width+i] = image(i,j,0,k);
+          }
+        }
+      }
+    }
+
+  }
+  
   struct Image
   {
     unsigned int width;
@@ -32,93 +51,72 @@ namespace gpu
   template<typename T>
   class ImageProcessing
   {
+  private:
+    LuminousFilters<T> luminousFilter;
+    ColorSpaceFilters<T> colorSpaceFilter;
   public:
-    void applyFilter(const CImg<T>& image, const Image& imgInfo,
-                     CImg<T>* destinationImage, LuminousFilters<T>* filterObject);
     
-    void applyFilter(const CImg<T>& image, const Image& imgInfo,
-                     T* buffer, LuminousFilters<T>* filterObject);
-    
-    void applyFilter(const CImg<T>& image, const Image& imgInfo,
-                     CImg<T>* destinationImage, ColorSpaceFilters<T>* filterObject);
-    
-    void applyFilter(const CImg<T>& image, const Image& imgInfo,
-                     T* buffer, ColorSpaceFilters<T>* filterObject);
-    
-    void unroll(CImg<T>& image, unsigned int width, unsigned int height,
-                unsigned int spectrum, T* buffer);
+    void adjustContrast(T *inputBuffer, T *outputBuffer, int imageWidth,
+                        int imageHeight, int spectrum, float value);
+    void adjustBrightness(T *inputBuffer, T *outputBuffer, int imageWidth,
+                          int imageHeight, int spectrum, float value); 
+    void sepia(T *inputBuffer, T *outputBuffer, int imageWidth,
+               int imageHeight, int spectrum);
   };
   
   template <typename T>
-  void ImageProcessing<T>::applyFilter(const CImg<T>& image, const Image& imgInfo,
-                                       CImg<T>* destinationImage,LuminousFilters<T>* filterObject)
+  void ImageProcessing<T>::adjustContrast(T *inputBuffer, T *outputBuffer, int imageWidth,
+                                          int imageHeight, int spectrum,float value)                                       
   {
-    for(int row = 0; row < imgInfo.width; ++row)
+    for(int channel = 0; channel < spectrum ; ++channel)
     {
-      for(int col = 0; col < imgInfo.height; ++col)
+      for(int j = 0; j < imageWidth; ++j)
       {
-        for(int channel = 0; channel < imgInfo.spectrum ; ++channel)
+        for(int i = 0; i < imageHeight; ++i)
         {
-          destinationImage->atXYZ(row,col,0,channel) = filterObject->apply(image(row,col,0,channel));
+          int k = channel*imageWidth*imageHeight +  i * imageWidth + j;
+          outputBuffer[k] = luminousFilter.apply(inputBuffer[k], value, LUMINOUS_FILTER_CONTRAST);
         }
       }
     }
   }
   
   template <typename T>
-  void ImageProcessing<T>::applyFilter(const CImg<T>& image,const Image& imgInfo,
-                                       T* buffer,LuminousFilters<T>* filterObject)
-                                       
+  void ImageProcessing<T>::adjustBrightness(T *inputBuffer, T *outputBuffer, int imageWidth,
+                                          int imageHeight, int spectrum,float value)                                       
   {
-    for(int channel = 0; channel < imgInfo.spectrum ; ++channel)
+    for(int channel = 0; channel < spectrum ; ++channel)
     {
-      for(int j = 0; j < imgInfo.width; ++j)
+      for(int j = 0; j < imageWidth; ++j)
       {
-        for(int i = 0; i < imgInfo.height; ++i)
+        for(int i = 0; i < imageHeight; ++i)
         {
-          int k = channel*imgInfo.width*imgInfo.height +  i * imgInfo.width + j;
-          buffer[k] = filterObject->apply(image(j,i,0,channel));
+          int k = channel*imageWidth*imageHeight +  i * imageWidth + j;
+          outputBuffer[k] = luminousFilter.apply(inputBuffer[k], value, LUMINOUS_FILTER_BRIGHTNESS);
         }
       }
     }
   }
   
   template <typename T>
-  void ImageProcessing<T>::applyFilter(const CImg<T>& image,const Image& imgInfo,
-                                       T* buffer,ColorSpaceFilters<T>* filterObject)
-  
+  void ImageProcessing<T>::sepia(T *inputBuffer, T *outputBuffer, 
+                                int imageWidth, int imageHeight, int spectrum)  
   {
-      for(int j = 0; j < imgInfo.width; ++j)
-      {
-        for(int i = 0; i < imgInfo.height; ++i)
-        {
-          int redChannel = 0*imgInfo.width*imgInfo.height +  i * imgInfo.width + j;
-          int greenChannel = 1*imgInfo.width*imgInfo.height +  i * imgInfo.width + j;
-          int blueChannel = 2*imgInfo.width*imgInfo.height +  i * imgInfo.width + j;
-          T pixelR = image(j,i,0,0);
-          T pixelG = image(j,i,0,1);
-          T pixelB = image(j,i,0,2);
-          filterObject->GetSepia(pixelR,pixelG,pixelB,buffer[redChannel],buffer[greenChannel],
-                                  buffer[blueChannel]);
-        }
-      }
-  }
-  
-  template <typename T>
-  void ImageProcessing<T>::unroll(CImg<T>& image,unsigned int width,
-                                   unsigned int height,unsigned int spectrum,T* buffer)
-  {
-    for(unsigned int k = 0;k<spectrum;++k)
+    if(spectrum == 3)
     {
-      for(unsigned int j=0;j<height;++j)
+      for(int j = 0; j < imageWidth; ++j)
       {
-        for(int i=0;i<width;++i)
+        for(int i = 0; i < imageHeight; ++i)
         {
-          buffer[k*height*width+j*width+i] = image(i,j,0,k);
+          int redChannel = 0*imageWidth*imageHeight +  i * imageWidth + j;
+          int greenChannel = 1*imageWidth*imageHeight +  i * imageWidth + j;
+          int blueChannel = 2*imageWidth*imageHeight +  i * imageWidth + j;
+          
+          colorSpaceFilter.Sepia(inputBuffer[redChannel],inputBuffer[greenChannel],inputBuffer[blueChannel],
+                                 outputBuffer[redChannel],outputBuffer[greenChannel],outputBuffer[blueChannel]);
         }
       }
     }
   }
-  
   
 }

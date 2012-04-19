@@ -30,24 +30,28 @@ int main(int argc, char* argv[])
     gpu::Image imgInfo(image.width(),image.height(),image.width()*image.height(),image.spectrum());
     printMetaData(imgInfo);
     
-    unsigned char* buffer = new unsigned char[imgInfo.spectrum*imgInfo.size];
+    /*
+     <summary> 
+     1. Allocate Buffers
+     2. Get Meta information from the image and assign that to ImageInfo object.
+     3. Copy image into Input Buffer (unroll operation).
+     4. Perform the operation.
+     */
     
+    unsigned char* inputBuffer = new unsigned char[imgInfo.spectrum*imgInfo.size];
+    unsigned char* outputBuffer = new unsigned char[imgInfo.spectrum*imgInfo.size];
+    
+    gpu::ImageProcessing<unsigned char> imp;
     timeval tim;
     
     double dTime1 = gpu::getTime(tim);
-    gpu::ImageProcessing<unsigned char> imp;
-    imp.unroll(image,imgInfo.width,imgInfo.height,imgInfo.spectrum,buffer);
     
-    //CImg<unsigned char> outputImage(imgInfo.width,imgInfo.height,1,imgInfo.spectrum);
+    gpu::unroll(image,imgInfo.width,imgInfo.height,imgInfo.spectrum,inputBuffer);
     
-    //    brightnessPtr = bFilter.apply;
-    //gpu::LuminousFilters<unsigned char> lFilter(0.0,1.2,gpu::LUMINOUS_FILTER_BRIGHTNESS);
-    //imp.applyFilter(image,imgInfo,buffer,&lFilter);
+    imp.sepia(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum);
     
-    gpu::ColorSpaceFilters<unsigned char> clsp;
-    imp.applyFilter(image, imgInfo, buffer, &clsp);
-    
-    CImg<unsigned char> outputImage(buffer,imgInfo.width,imgInfo.height,1,imgInfo.spectrum,0);
+    CImg<unsigned char> outputImage(outputBuffer,imgInfo.width,imgInfo.height,1,imgInfo.spectrum,0);
+    outputImage.save_jpeg("/Users/akashmehra/Pictures/empirestate_output.jpg");
     
     double dTime2 = gpu::getTime(tim);
     std::cout << "time taken for unrolled version: " << dTime2 - dTime1 << std::endl;
@@ -58,7 +62,8 @@ int main(int argc, char* argv[])
     {
       mainDisplay.wait();
     }
-    delete[] buffer;
+    delete[] inputBuffer;
+    delete[] outputBuffer;
   }
   else
   {

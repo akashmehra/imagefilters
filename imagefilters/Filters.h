@@ -32,22 +32,16 @@ namespace gpu
   class LuminousFilters
   {
   private:
-    T contrast(const T& pixel);
-    T brightness(const T& pixel);
+    T contrast(const T& pixel, float cValue);
+    T brightness(const T& pixel, float bValue);
     float cValue, bValue;
     FilterType filterType;
   public:
-    LuminousFilters(const float cValue_, const float bValue_,
-                    FilterType filterType_)
-    :cValue(cValue_),
-    bValue(bValue_),
-    filterType(filterType_)
-    {}
-    T apply(const T& pixel);
+    T apply(const T& pixel,float value, FilterType filterType);
   };
   
   template<typename T>
-  T LuminousFilters<T>::contrast(const T& pixel)
+  T LuminousFilters<T>::contrast(const T& pixel, float cValue)
   {
     if(cValue > 1)
     {
@@ -60,7 +54,7 @@ namespace gpu
   }
   
   template<typename T>
-  T LuminousFilters<T>::brightness(const T& pixel)
+  T LuminousFilters<T>::brightness(const T& pixel, float bValue)
   {
     int val = (int)(pixel*bValue);
     PIXEL_DOMAIN_CHECK(val);
@@ -68,15 +62,15 @@ namespace gpu
   }
   
   template<typename T>
-  T LuminousFilters<T>::apply(const T& pixel) 
+  T LuminousFilters<T>::apply(const T& pixel, float value, FilterType filterType) 
   {
     switch(filterType)
     {
       case LUMINOUS_FILTER_CONTRAST:
-        return contrast(pixel);
+        return contrast(pixel, value);
         break;
       case LUMINOUS_FILTER_BRIGHTNESS:
-        return brightness(pixel);
+        return brightness(pixel, value);
         break;
     }
   }
@@ -100,7 +94,7 @@ namespace gpu
     void GetBW(T &pixelR,T &pixelG,T &pixelB,T &pixelOutputR,
               T& pixelOutputG,T& pixelOutputB);
     
-    void GetSepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
+    void Sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
                   T &pixelOutputG,T &pixelOutputB);
   };
   
@@ -183,16 +177,12 @@ namespace gpu
   }
   
   template<typename T>
-  void ColorSpaceFilters<T>::GetSepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
+  void ColorSpaceFilters<T>::Sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
                             T &pixelOutputG,T &pixelOutputB)                       
   {
     /***Filter can be implemented inplace ***/
     ///BW filter is basically 0.6*R + 0.35*G + 0.5*B
     ///Sepia we basically add some in RedChannel, and siginficantly less in Green Channel
-   /* float value = 0.6*pixelR+0.35*pixelG+0.05*pixelB;
-    pixelOutputR = pixelOutputG=pixelOutputB=value;
-    pixelOutputR *= 1.4;
-    pixelOutputG *= 1.1;*/
     
     float temp = 1.25 * pixelR;
     PIXEL_DOMAIN_CHECK(temp);

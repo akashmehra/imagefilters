@@ -58,7 +58,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/akashmehra/Code/beach.jpg"
+            argument = "/Users/akashmehra/gpu/imagefilters/images/empirestate.jpg"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

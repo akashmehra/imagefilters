@@ -29,10 +29,12 @@
 		08E73C27153F7E1000A04613 /* ImageProcessingFilters */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ImageProcessingFilters; sourceTree = BUILT_PRODUCTS_DIR; };
 		08E73C2D153F7E1000A04613 /* ImageProcessingFilters.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = ImageProcessingFilters.1; sourceTree = "<group>"; };
 		08E73C39153F7E4E00A04613 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = ../../imagefilters/CImg.h; sourceTree = "<group>"; };
-		08E73C3A153F7E4E00A04613 /* newTemplates */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = newTemplates; path = ../../imagefilters/newTemplates; sourceTree = "<group>"; };
 		08E73C3B153F7E4E00A04613 /* processImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = processImage.cpp; path = ../../imagefilters/processImage.cpp; sourceTree = "<group>"; };
 		08E73C3C153F7E4E00A04613 /* processImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = processImage.h; path = ../../imagefilters/processImage.h; sourceTree = "<group>"; };
 		08E73C3E153F7E9700A04613 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../usr/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
+		08E73C45153FCDE800A04613 /* Filters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Filters.h; path = ../../imagefilters/Filters.h; sourceTree = "<group>"; };
+		08E73C46153FD73A00A04613 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Constants.h; path = ../../imagefilters/Constants.h; sourceTree = "<group>"; };
+		08E73C47153FE2CD00A04613 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../../imagefilters/Utils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,13 +69,31 @@
 		08E73C2A153F7E1000A04613 /* ImageProcessingFilters */ = {
 			isa = PBXGroup;
 			children = (
-				08E73C39153F7E4E00A04613 /* CImg.h */,
-				08E73C3A153F7E4E00A04613 /* newTemplates */,
-				08E73C3B153F7E4E00A04613 /* processImage.cpp */,
-				08E73C3C153F7E4E00A04613 /* processImage.h */,
+				08E73C48153FE2FC00A04613 /* Headers */,
+				08E73C49153FE31900A04613 /* Classes */,
 				08E73C2D153F7E1000A04613 /* ImageProcessingFilters.1 */,
 			);
 			path = ImageProcessingFilters;
+			sourceTree = "<group>";
+		};
+		08E73C48153FE2FC00A04613 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				08E73C39153F7E4E00A04613 /* CImg.h */,
+				08E73C3C153F7E4E00A04613 /* processImage.h */,
+				08E73C45153FCDE800A04613 /* Filters.h */,
+				08E73C46153FD73A00A04613 /* Constants.h */,
+				08E73C47153FE2CD00A04613 /* Utils.h */,
+			);
+			name = Headers;
+			sourceTree = "<group>";
+		};
+		08E73C49153FE31900A04613 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				08E73C3B153F7E4E00A04613 /* processImage.cpp */,
+			);
+			name = Classes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -182,6 +202,7 @@
 		08E73C32153F7E1000A04613 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/X11/lib,
@@ -203,6 +224,7 @@
 		08E73C33153F7E1000A04613 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/X11/lib,
@@ -231,6 +253,7 @@
 				08E73C33153F7E1000A04613 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -98,7 +98,7 @@ namespace gpu
           T pixelR = image(j,i,0,0);
           T pixelG = image(j,i,0,1);
           T pixelB = image(j,i,0,2);
-          filterObject->saturation(100,pixelR,pixelG,pixelB,buffer[redChannel],buffer[greenChannel],
+          filterObject->GetSepia(pixelR,pixelG,pixelB,buffer[redChannel],buffer[greenChannel],
                                   buffer[blueChannel]);
         }
       }

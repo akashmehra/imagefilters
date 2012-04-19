@@ -189,10 +189,23 @@ namespace gpu
     /***Filter can be implemented inplace ***/
     ///BW filter is basically 0.6*R + 0.35*G + 0.5*B
     ///Sepia we basically add some in RedChannel, and siginficantly less in Green Channel
-    float value = 0.6*pixelR+0.35*pixelG+0.5*pixelB;
+   /* float value = 0.6*pixelR+0.35*pixelG+0.05*pixelB;
     pixelOutputR = pixelOutputG=pixelOutputB=value;
     pixelOutputR *= 1.4;
-    pixelOutputG *= 1.1;
+    pixelOutputG *= 1.1;*/
+    
+    float temp = 1.25 * pixelR;
+    PIXEL_DOMAIN_CHECK(temp);
+    pixelOutputR = temp;
+    
+    temp = 1.05 * pixelG;
+    PIXEL_DOMAIN_CHECK(temp);
+    pixelOutputG = temp;
+    
+    temp = 1.25 * pixelB;
+    PIXEL_DOMAIN_CHECK(temp);
+    pixelOutputB = temp;
+    
   }
   
   // ColorSpace Filters End.

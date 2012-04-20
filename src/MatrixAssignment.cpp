@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 New York University. All rights reserved.
 //
 
-/*#include <iostream>
+#include <iostream>
 #include "Constants.h"
 
 template<typename T>
@@ -87,4 +87,4 @@ void runKernel(unsigned char* h_data, const unsigned int problemSize)
   
   cudaFree(d_data);
   cudaFree(d_result);
-}*/
+}

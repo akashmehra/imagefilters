@@ -17,7 +17,7 @@
 #define UNSIGNED_CHAR_MIN 0
 #define S_VALUE 50
 #define SIGNED_CHAR_MAX 128
-#define MAX_THREADS 512
+#define MAX_THREADS 256
 #define PIXEL_DOMAIN_CHECK(T){if(T>255)T=255;else if (T<0)T=0;}
 
 #endif //gpu_Constants_h

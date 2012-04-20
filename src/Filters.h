@@ -56,7 +56,7 @@ namespace gpu
   template<typename T>
   T LuminousFilters<T>::brightness(const T& pixel, float bValue)
   {
-    int val = (int)(pixel+bValue);
+    int val = (int)(pixel*bValue);
     PIXEL_DOMAIN_CHECK(val);
     return val;
   }

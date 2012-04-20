@@ -56,7 +56,7 @@ namespace gpu
   template<typename T>
   T LuminousFilters<T>::brightness(const T& pixel, float bValue)
   {
-    int val = (int)(pixel*bValue);
+    int val = (int)(pixel+bValue);
     PIXEL_DOMAIN_CHECK(val);
     return val;
   }
@@ -91,7 +91,7 @@ namespace gpu
     
     void ApplyFunctionOnPixel(float *curveFunction,T& pixel,T& pixelOutput);                             
     
-    void GetBW(T &pixelR,T &pixelG,T &pixelB,T &pixelOutputR,
+    void BlackNWhite(T &pixelR,T &pixelG,T &pixelB,T &pixelOutputR,
               T& pixelOutputG,T& pixelOutputB);
     
     void Sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
@@ -167,7 +167,7 @@ namespace gpu
   }
   
   template<typename T>
-  void ColorSpaceFilters<T>::GetBW(T &pixelR,T &pixelG, T &pixelB,T &pixelOutputR,
+  void ColorSpaceFilters<T>::BlackNWhite(T &pixelR,T &pixelG, T &pixelB,T &pixelOutputR,
                          T& pixelOutputG,T& pixelOutputB)
   {
     /***Filter can be implemented inplace ***/

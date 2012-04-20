@@ -20,10 +20,10 @@ void printMetaData(const gpu::Image& image)
 int main(int argc, char* argv[])
 {
   cimg::imagemagick_path("/opt/local/bin/convert");
-  if(argc == 2)
+  if(argc == 3)
   {
     std::string filename = argv[1];
-    
+    std::string outputFilename = argv[2];
     CImg<unsigned char> image(filename.c_str());
     CImgDisplay mainDisplay(image,"Image",0);
 
@@ -46,16 +46,19 @@ int main(int argc, char* argv[])
     
     double dTime1 = gpu::getTime(tim);
     
-    gpu::unroll(image,imgInfo.width,imgInfo.height,imgInfo.spectrum,inputBuffer);
+    gpu::unroll(image,imgInfo.width,imgInfo.height,imgInfo.spectrum,
+                inputBuffer);
     
-    imp.sepia(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum);
+    imp.adjustBrightness(inputBuffer, outputBuffer,imgInfo.width, imgInfo.height, imgInfo.spectrum, 25.0f); 
+                   
     
-    CImg<unsigned char> outputImage(outputBuffer,imgInfo.width,imgInfo.height,1,imgInfo.spectrum,0);
-    outputImage.save_jpeg("/Users/akashmehra/Pictures/empirestate_output.jpg");
+    CImg<unsigned char> outputImage(outputBuffer,imgInfo.width,imgInfo.height,1,
+                                    imgInfo.spectrum,0);
     
     double dTime2 = gpu::getTime(tim);
     std::cout << "time taken for unrolled version: " << dTime2 - dTime1 << std::endl;
-
+    
+    outputImage.save_jpeg(outputFilename.c_str());
     CImgDisplay darkDisplay(outputImage,"Output Image",0);
     
     while(!(mainDisplay.is_closed()))
@@ -67,6 +70,6 @@ int main(int argc, char* argv[])
   }
   else
   {
-    std::cout << "Usage: " << argv[0] << " <image-filename>" << std::endl;
+    std::cout << "Usage: " << argv[0] << " <image-filename> <output-filename>" << std::endl;
   }
 }

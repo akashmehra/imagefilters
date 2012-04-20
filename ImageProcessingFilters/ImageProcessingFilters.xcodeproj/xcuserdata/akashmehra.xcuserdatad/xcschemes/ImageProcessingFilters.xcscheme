@@ -58,7 +58,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/akashmehra/gpu/imagefilters/images/empirestate.jpg"
+            argument = "/Users/akashmehra/Pictures/empire_state_night.jpg"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "empirestate_night_output.jpg"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

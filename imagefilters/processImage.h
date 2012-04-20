@@ -62,6 +62,8 @@ namespace gpu
                           int imageHeight, int spectrum, float value); 
     void sepia(T *inputBuffer, T *outputBuffer, int imageWidth,
                int imageHeight, int spectrum);
+    void saturation(float sValue,T *inputBuffer, T *outputBuffer, 
+                    int imageWidth, int imageHeight, int spectrum);  
   };
   
   template <typename T>
@@ -114,6 +116,28 @@ namespace gpu
           
           colorSpaceFilter.Sepia(inputBuffer[redChannel],inputBuffer[greenChannel],inputBuffer[blueChannel],
                                  outputBuffer[redChannel],outputBuffer[greenChannel],outputBuffer[blueChannel]);
+        }
+      }
+    }
+  }
+  
+  template <typename T>
+  void ImageProcessing<T>::saturation(float sValue, T *inputBuffer, T *outputBuffer, 
+                                      int imageWidth, int imageHeight, int spectrum)  
+  {
+    if(spectrum == 3)
+    {
+      for(int j = 0; j < imageWidth; ++j)
+      {
+        for(int i = 0; i < imageHeight; ++i)
+        {
+          int redChannel = 0*imageWidth*imageHeight +  i * imageWidth + j;
+          int greenChannel = 1*imageWidth*imageHeight +  i * imageWidth + j;
+          int blueChannel = 2*imageWidth*imageHeight +  i * imageWidth + j;
+          
+          colorSpaceFilter.saturation(sValue,inputBuffer[redChannel],inputBuffer[greenChannel],
+                                      inputBuffer[blueChannel],outputBuffer[redChannel],
+                                      outputBuffer[greenChannel],outputBuffer[blueChannel]);
         }
       }
     }

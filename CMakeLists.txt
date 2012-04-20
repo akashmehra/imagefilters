@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8)
 project (imagefilters)
-
-add_subdirectory(imagefilters)
+file(COPY images DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+add_subdirectory(src)

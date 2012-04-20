@@ -2,7 +2,6 @@
 #include <string>
 #include <ctime>
 #include <vector>
-#include "CImg.h"
 
 #include "cpuProcessImage.h"
 #include "Filters.h"

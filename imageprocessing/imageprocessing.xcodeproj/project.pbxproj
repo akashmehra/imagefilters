@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0816065015440F6F000BA837 /* cpuProcessImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0816064F15440F6F000BA837 /* cpuProcessImage.cpp */; };
 		0851FDB915414ACF009E2100 /* imageprocessing.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0851FDB815414ACF009E2100 /* imageprocessing.1 */; };
-		0851FDC515414AEC009E2100 /* cpuProcessImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0851FDC115414AEC009E2100 /* cpuProcessImage.cpp */; };
 		0851FDC915414C6D009E2100 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0851FDC815414C6D009E2100 /* libX11.6.dylib */; };
 /* End PBXBuildFile section */
 
@@ -26,14 +26,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0816064915440F67000BA837 /* blendFilters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = blendFilters.h; path = ../../src/blendFilters.h; sourceTree = "<group>"; };
+		0816064A15440F67000BA837 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = ../../src/CImg.h; sourceTree = "<group>"; };
+		0816064B15440F67000BA837 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Constants.h; path = ../../src/Constants.h; sourceTree = "<group>"; };
+		0816064C15440F67000BA837 /* cpuProcessImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpuProcessImage.h; path = ../../src/cpuProcessImage.h; sourceTree = "<group>"; };
+		0816064D15440F67000BA837 /* Filters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Filters.h; path = ../../src/Filters.h; sourceTree = "<group>"; };
+		0816064E15440F67000BA837 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../../src/Utils.h; sourceTree = "<group>"; };
+		0816064F15440F6F000BA837 /* cpuProcessImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cpuProcessImage.cpp; path = ../../src/cpuProcessImage.cpp; sourceTree = "<group>"; };
+		0816065115440FD4000BA837 /* temp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = temp.h; sourceTree = "<group>"; };
 		0851FDB215414ACF009E2100 /* imageprocessing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = imageprocessing; sourceTree = BUILT_PRODUCTS_DIR; };
 		0851FDB815414ACF009E2100 /* imageprocessing.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = imageprocessing.1; sourceTree = "<group>"; };
-		0851FDBF15414AEC009E2100 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CImg.h; sourceTree = "<group>"; };
-		0851FDC015414AEC009E2100 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
-		0851FDC115414AEC009E2100 /* cpuProcessImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cpuProcessImage.cpp; sourceTree = "<group>"; };
-		0851FDC215414AEC009E2100 /* cpuProcessImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpuProcessImage.h; sourceTree = "<group>"; };
-		0851FDC315414AEC009E2100 /* Filters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Filters.h; sourceTree = "<group>"; };
-		0851FDC415414AEC009E2100 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		0851FDC815414C6D009E2100 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../usr/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
 		08E7BDF4154393A4006F654B /* gpuProcessImage.cu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = gpuProcessImage.cu; path = ../../src/gpuProcessImage.cu; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -80,12 +82,14 @@
 		0851FDC615414AF6009E2100 /* HEADERS */ = {
 			isa = PBXGroup;
 			children = (
+				0816064915440F67000BA837 /* blendFilters.h */,
+				0816064A15440F67000BA837 /* CImg.h */,
+				0816064B15440F67000BA837 /* Constants.h */,
+				0816064C15440F67000BA837 /* cpuProcessImage.h */,
+				0816064D15440F67000BA837 /* Filters.h */,
+				0816064E15440F67000BA837 /* Utils.h */,
 				08E7BDF4154393A4006F654B /* gpuProcessImage.cu */,
-				0851FDBF15414AEC009E2100 /* CImg.h */,
-				0851FDC015414AEC009E2100 /* Constants.h */,
-				0851FDC215414AEC009E2100 /* cpuProcessImage.h */,
-				0851FDC315414AEC009E2100 /* Filters.h */,
-				0851FDC415414AEC009E2100 /* Utils.h */,
+				0816065115440FD4000BA837 /* temp.h */,
 			);
 			name = HEADERS;
 			sourceTree = "<group>";
@@ -93,7 +97,7 @@
 		0851FDC715414AFD009E2100 /* CLASSES */ = {
 			isa = PBXGroup;
 			children = (
-				0851FDC115414AEC009E2100 /* cpuProcessImage.cpp */,
+				0816064F15440F6F000BA837 /* cpuProcessImage.cpp */,
 			);
 			name = CLASSES;
 			sourceTree = "<group>";
@@ -149,7 +153,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0851FDC515414AEC009E2100 /* cpuProcessImage.cpp in Sources */,
+				0816065015440F6F000BA837 /* cpuProcessImage.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

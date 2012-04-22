@@ -11,7 +11,9 @@
 #include "Constants.h"
 using namespace cimg_library;
 
-__device__ void calculateChannelOffsets(int offset, int blockIndex, int blockDimension, int threadIndex,int* redChannelOffset, int* greenChannelOffset, int* blueChannelOffset)
+__device__ void calculateChannelOffsets(int offset, int blockIndex, int blockDimension, 
+                                        int threadIndex,int* redChannelOffset, 
+                                        int* greenChannelOffset, int* blueChannelOffset)
 {
 	*redChannelOffset = blockIndex * blockDimension + threadIndex;
 	*greenChannelOffset = *redChannelOffset + 1*offset;
@@ -21,26 +23,33 @@ __device__ void calculateChannelOffsets(int offset, int blockIndex, int blockDim
 
 template <typename T>
 __global__ void colorspaceFilterKernel(T* inputBuffer, T* outputBuffer, int width, 
-                            					int height, int channels,int offset, float value, gpu::FilterType filterType)
+                                       int height, int channels,int offset, 
+                                       float value, gpu::FilterType filterType)
 {
   
- 	int redChannelOffset, greenChannelOffset, blueChannelOffset; 
-  calculateChannelOffsets(offset, blockIdx.x, blockDim.x, threadIdx.x, &redChannelOffset, &greenChannelOffset, &blueChannelOffset);
-
+ 	int redChannelOffset, greenChannelOffset, blueChannelOffset;
+  
+  calculateChannelOffsets(offset,blockIdx.x,blockDim.x,threadIdx.x,
+                          &redChannelOffset, &greenChannelOffset, &blueChannelOffset);
+  
 	gpu::ColorSpaceFilters<T> colorSpaceFilters;
-  colorSpaceFilters.apply(inputBuffer[redChannelOffset],inputBuffer[greenChannelOffset],inputBuffer[blueChannelOffset],
-													outputBuffer[redChannelOffset],outputBuffer[greenChannelOffset],outputBuffer[blueChannelOffset],value,filterType);
+  
+  colorSpaceFilters.apply(inputBuffer[redChannelOffset],inputBuffer[greenChannelOffset],
+                          inputBuffer[blueChannelOffset], outputBuffer[redChannelOffset],
+                          outputBuffer[greenChannelOffset],outputBuffer[blueChannelOffset],
+                          value,filterType);
   __syncthreads();
 }
 
 template <typename T>
 __global__ void luminousFilterKernel(T* inputBuffer, T* outputBuffer, int width, 
-                            int height, int channels,int offset, float value , gpu::FilterType filterType)
+                                     int height, int channels,int offset, float value , 
+                                     gpu::FilterType filterType)
 {
   
  	int redChannelOffset, greenChannelOffset, blueChannelOffset; 
   calculateChannelOffsets(offset, blockIdx.x, blockDim.x, threadIdx.x, &redChannelOffset, &greenChannelOffset, &blueChannelOffset);
-
+  
 	gpu::LuminousFilters<T> luminousFilters;
   outputBuffer[redChannelOffset] =   luminousFilters.apply(inputBuffer[redChannelOffset],value,filterType);
   outputBuffer[greenChannelOffset] = luminousFilters.apply(inputBuffer[greenChannelOffset],value,filterType);
@@ -65,13 +74,15 @@ unsigned int powerOf2( unsigned int x ) {
 }
 
 template <typename T>
-void callKernel(void(*kernel)(T*,T*,int,int,int,int,float,gpu::FilterType), int blocks, int threads, 
+void callKernel(void(*kernel)(T*,T*,int,int,int,int,float,gpu::FilterType), 
+                int blocks, int threads, 
           			T* inputBuffer,T* outputBuffer,
-								int width, int height, int channels, int offset, float value,gpu::FilterType filterType) 
+								int width, int height, int channels, int offset, 
+                float value,gpu::FilterType filterType) 
 {
-    dim3 dimGrid(blocks,1,1);
-    dim3 dimBlock(threads,1,1);
-    kernel<<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer, width, height, channels, offset, value,filterType);
+  dim3 dimGrid(blocks,1,1);
+  dim3 dimBlock(threads,1,1);
+  kernel<<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer, width, height, channels, offset, value,filterType);
 }
 
 
@@ -110,7 +121,7 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,int width, int hei
   getSetupConfig(width*height,&setup);
   std::cout << "Blocks: " << setup.blocks << std::endl;
   std::cout << "Threads: " << setup.threads << std::endl;
-
+  
   unsigned char *d_data;
   cudaMalloc((void**)&d_data,sizeData);
   cudaMemcpy(d_data,h_data,sizeData,cudaMemcpyHostToDevice);
@@ -119,10 +130,11 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,int width, int hei
   cudaMalloc((void**)&d_result,sizeData);
   
   int offset = width*height;
-//  callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
+  //  callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
   //                          d_data,d_result,width,height,channels,offset, BRIGHTNESS_VALUE, gpu::LUMINOUS_FILTER_BRIGHTNESS);
   callKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
-                            d_data,d_result,width,height,channels,offset,SATURATION_VALUE, gpu::COLORSPACE_FILTER_SATURATION);
+                            d_data,d_result,width,height,channels,offset,
+                            SATURATION_VALUE, gpu::COLORSPACE_FILTER_SATURATION);
   
   cudaMemcpy(h_result,d_result,sizeResult,
              cudaMemcpyDeviceToHost);
@@ -148,7 +160,7 @@ int main(int argc, char* argv[])
     std::string outputFilename = argv[2];
     CImg<unsigned char> image(filename.c_str());
     CImgDisplay mainDisplay(image,"Image",0);
-
+    
     gpu::Image imgInfo(image.width(),image.height(),image.width()*image.height(),image.spectrum());
     printMetaData(imgInfo);
     

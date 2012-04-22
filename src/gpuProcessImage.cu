@@ -27,7 +27,6 @@ __global__ void imageKernel(T* inputBuffer, T* outputBuffer, int width,
   int redChannelOffset = blockIdx.x * blockDim.x + threadIdx.x;
   int greenChannelOffset = redChannelOffset + 1*offset;
   int blueChannelOffset = redChannelOffset + 2*offset;
-  float brightnessVal = 0.0f;
   outputBuffer[redChannelOffset] =   brightness(inputBuffer[redChannelOffset],1.2);
   outputBuffer[greenChannelOffset] = brightness(inputBuffer[greenChannelOffset],1.2);
   outputBuffer[blueChannelOffset] =  brightness(inputBuffer[blueChannelOffset],1.2);
@@ -51,12 +50,13 @@ unsigned int powerOf2( unsigned int x ) {
 }
 
 template <typename T>
-void callKernel(void(*kernel)(T*,T*,int,int,int), int blocks, int threads, 
-          T* inputBuffer,T* outputBuffer,int wdth, int height, int channels, int offset) 
+void callKernel(void(*kernel)(T*,T*,int,int,int,int), int blocks, int threads, 
+          			T* inputBuffer,T* outputBuffer,
+								int width, int height, int channels, int offset) 
 {
     dim3 dimGrid(blocks,1,1);
     dim3 dimBlock(threads,1,1);
-    (*kernel)<T><<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer, width, height, channels, offset);
+    kernel<<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer, width, height, channels, offset);
 }
 
 
@@ -78,7 +78,7 @@ void sendWarmUpSignal(unsigned char* h_data, const unsigned int sizeData)
   cudaFree(d_data);
 }
 
-void runKernel(unsigned char* h_data, unsigned char* h_result,const unsigned int width, const unsigned int height, unsigned int channels)
+void runKernel(unsigned char* h_data, unsigned char* h_result,int width, int height, int channels)
 {
   int problemSize = width*height*channels;
   int sizeData = problemSize*sizeof(unsigned char);
@@ -102,7 +102,7 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,const unsigned int
   int offset = width*height;
   //processingKernel<unsigned char><<<dimGrid,dimBlock>>>(d_data,d_result,width,height,channels, offset);
   callKernel<unsigned char>(imageKernel,setup.blocks,setup.threads,
-                            d_data,d_result,width,height,channels, offset);
+                            d_data,d_result,width,height,channels,offset);
   
   cudaMemcpy(h_result,d_result,sizeResult,
              cudaMemcpyDeviceToHost);

@@ -13,9 +13,9 @@
 
 
 #ifdef GCC_COMPILATION
-  #define FUNCTION_PREFIX 
+#define FUNCTION_PREFIX 
 #else 
-  #define FUNCTION_PREFIX __host__ __device__
+#define FUNCTION_PREFIX __host__ __device__
 #endif
 
 
@@ -96,16 +96,16 @@ namespace gpu
                                T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue, FilterType filterType);
     
 	private:
-		FUNCTION_PREFIX   void saturation(T& pixelR, T& pixelG,T& pixelB,
-    										            	T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue);
+		FUNCTION_PREFIX void saturation(T& pixelR, T& pixelG,T& pixelB,
+                                    T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue);
     
-   	FUNCTION_PREFIX  void NormalizePixel(float whitePoint,float blackPoint,float outputWhitePoint,
-                                         float outputBlackPoint,T& pixel, T& pixelOutput);
+   	FUNCTION_PREFIX void NormalizePixel(float whitePoint,float blackPoint,float outputWhitePoint,
+                                        float outputBlackPoint,T& pixel, T& pixelOutput);
     
     FUNCTION_PREFIX void ApplyFunctionOnPixel(float *curveFunction,T& pixel,T& pixelOutput);                             
     
-   	FUNCTION_PREFIX  void BlackNWhite(T &pixelR,T &pixelG,T &pixelB,T &pixelOutputR,
-              												T& pixelOutputG,T& pixelOutputB);
+   	FUNCTION_PREFIX void BlackNWhite(T &pixelR,T &pixelG,T &pixelB,T &pixelOutputR,
+                                     T& pixelOutputG,T& pixelOutputB);
     
     FUNCTION_PREFIX void sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
                                T &pixelOutputG,T &pixelOutputB);
@@ -113,7 +113,8 @@ namespace gpu
   
 	template<typename T>
 	FUNCTION_PREFIX void ColorSpaceFilters<T>::apply(T& pixelR, T& pixelG,T& pixelB,
-                                                   T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue, FilterType filterType)
+                                                   T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,
+                                                   float sValue, FilterType filterType)
 	{
 		switch(filterType)
 		{
@@ -176,8 +177,10 @@ namespace gpu
   }
   
   template<typename T>
-  FUNCTION_PREFIX void ColorSpaceFilters<T>::NormalizePixel(float whitePoint,float blackPoint,float outputWhitePoint,
-                                                            float outputBlackPoint,T& pixel,T& pixelOutput)
+  FUNCTION_PREFIX void ColorSpaceFilters<T>::NormalizePixel(float whitePoint,float blackPoint,
+                                                            float outputWhitePoint,
+                                                            float outputBlackPoint,T& pixel,
+                                                            T& pixelOutput)
   {
     /***Filter can be implemented inplace.***/
     //Values for both all the input values can be between 0-255;
@@ -187,7 +190,8 @@ namespace gpu
   } 
   
   template<typename T>
-  FUNCTION_PREFIX void ColorSpaceFilters<T>::ApplyFunctionOnPixel(float *curveFunction,T& pixel,T& pixelOutput)
+  FUNCTION_PREFIX void ColorSpaceFilters<T>::ApplyFunctionOnPixel(float *curveFunction,
+                                                                  T& pixel,T& pixelOutput)
   {
     /***Filter can be implemented inplace. ***/
     ///Curve function defines the the output values from 0-255 got after Spline fitting
@@ -197,7 +201,8 @@ namespace gpu
   }
   
   template<typename T>
-  FUNCTION_PREFIX void ColorSpaceFilters<T>::BlackNWhite(T &pixelR,T &pixelG, T &pixelB,T &pixelOutputR,
+  FUNCTION_PREFIX void ColorSpaceFilters<T>::BlackNWhite(T &pixelR,T &pixelG, 
+                                                         T &pixelB,T &pixelOutputR,
                                                          T& pixelOutputG,T& pixelOutputB)
   {
     /***Filter can be implemented inplace ***/

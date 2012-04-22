@@ -11,26 +11,25 @@
 #include "Constants.h"
 using namespace cimg_library;
 
-/*template<typename T>
-__device__ T brightness(const T& pixel, float bValue)
+__device__ void calculateChannelOffsets(int offset, int blockIndex, int blockDimension, int threadIndex,int* redChannelOffset, int* greenChannelOffset, int* blueChannelOffset)
 {
-	int val = (int)(pixel*bValue);
-  PIXEL_DOMAIN_CHECK(val);
-  return val;
-}*/
+	*redChannelOffset = blockIndex * blockDimension + threadIndex;
+	*greenChannelOffset = *redChannelOffset + 1*offset;
+	*blueChannelOffset = *redChannelOffset + 2*offset;
+}
 
 template <typename T>
-__global__ void imageKernel(T* inputBuffer, T* outputBuffer, int width, 
-                            int height, int channels,int offset)
+__global__ void luminousFilterKernel(T* inputBuffer, T* outputBuffer, int width, 
+                            int height, int channels,int offset, float value , gpu::FilterType filterType)
 {
   
-  int redChannelOffset = blockIdx.x * blockDim.x + threadIdx.x;
-  int greenChannelOffset = redChannelOffset + 1*offset;
-  int blueChannelOffset = redChannelOffset + 2*offset;
-	LuminousFilters<T> luminousFilters;
-  outputBuffer[redChannelOffset] =   luminousFilters.brightness(inputBuffer[redChannelOffset],1.2);
-  outputBuffer[greenChannelOffset] = luminousFilters.brightness(inputBuffer[greenChannelOffset],1.2);
-  outputBuffer[blueChannelOffset] =  luminousFilters.brightness(inputBuffer[blueChannelOffset],1.2);
+ 	int redChannelOffset, greenChannelOffset, blueChannelOffset; 
+  calculateChannelOffsets(offset, blockIdx.x, blockDim.x, threadIdx.x, &redChannelOffset, &greenChannelOffset, &blueChannelOffset);
+
+	gpu::LuminousFilters<T> luminousFilters;
+  outputBuffer[redChannelOffset] =   luminousFilters.apply(inputBuffer[redChannelOffset],value,filterType);
+  outputBuffer[greenChannelOffset] = luminousFilters.apply(inputBuffer[greenChannelOffset],value,filterType);
+  outputBuffer[blueChannelOffset] =  luminousFilters.apply(inputBuffer[blueChannelOffset],value,filterType);
   __syncthreads();
 }
 
@@ -51,13 +50,13 @@ unsigned int powerOf2( unsigned int x ) {
 }
 
 template <typename T>
-void callKernel(void(*kernel)(T*,T*,int,int,int,int), int blocks, int threads, 
+void callKernel(void(*kernel)(T*,T*,int,int,int,int,float,gpu::FilterType), int blocks, int threads, 
           			T* inputBuffer,T* outputBuffer,
-								int width, int height, int channels, int offset) 
+								int width, int height, int channels, int offset, float value,gpu::FilterType filterType) 
 {
     dim3 dimGrid(blocks,1,1);
     dim3 dimBlock(threads,1,1);
-    kernel<<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer, width, height, channels, offset);
+    kernel<<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer, width, height, channels, offset, value,filterType);
 }
 
 
@@ -97,13 +96,10 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,int width, int hei
   unsigned char* d_result;
   cudaMalloc((void**)&d_result,sizeData);
   
-  //dim3 dimGrid(setup.blocks,1,1);
-  //dim3 dimBlock(setup.threads,1,1);
   int sizeSharedMem = problemSize;
   int offset = width*height;
-  //processingKernel<unsigned char><<<dimGrid,dimBlock>>>(d_data,d_result,width,height,channels, offset);
-  callKernel<unsigned char>(imageKernel,setup.blocks,setup.threads,
-                            d_data,d_result,width,height,channels,offset);
+  callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
+                            d_data,d_result,width,height,channels,offset, BRIGHTNESS_VALUE, gpu::LUMINOUS_FILTER_BRIGHTNESS);
   
   cudaMemcpy(h_result,d_result,sizeResult,
              cudaMemcpyDeviceToHost);
@@ -156,9 +152,6 @@ int main(int argc, char* argv[])
     double dTime2 = gpu::getTime(tim);
     std::cout << "time taken for performing warm up: " << dTime2 - dTime1 << std::endl;
     runKernel(inputBuffer,outputBuffer,imgInfo.width, imgInfo.height, imgInfo.spectrum);
-    
-    //imp.saturation(S_VALUE,inputBuffer, outputBuffer, 
-      //             imgInfo.width, imgInfo.height, imgInfo.spectrum);
     
     CImg<unsigned char> outputImage(outputBuffer,imgInfo.width,imgInfo.height,1,
                                     imgInfo.spectrum,0);

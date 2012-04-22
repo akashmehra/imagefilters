@@ -18,6 +18,21 @@ __device__ void calculateChannelOffsets(int offset, int blockIndex, int blockDim
 	*blueChannelOffset = *redChannelOffset + 2*offset;
 }
 
+
+template <typename T>
+__global__ void colorspaceFilterKernel(T* inputBuffer, T* outputBuffer, int width, 
+                            					int height, int channels,int offset, float value, gpu::FilterType filterType)
+{
+  
+ 	int redChannelOffset, greenChannelOffset, blueChannelOffset; 
+  calculateChannelOffsets(offset, blockIdx.x, blockDim.x, threadIdx.x, &redChannelOffset, &greenChannelOffset, &blueChannelOffset);
+
+	gpu::ColorSpaceFilters<T> colorSpaceFilters;
+  colorSpaceFilters.apply(inputBuffer[redChannelOffset],inputBuffer[greenChannelOffset],inputBuffer[blueChannelOffset],
+													outputBuffer[redChannelOffset],outputBuffer[greenChannelOffset],outputBuffer[blueChannelOffset],value,filterType);
+  __syncthreads();
+}
+
 template <typename T>
 __global__ void luminousFilterKernel(T* inputBuffer, T* outputBuffer, int width, 
                             int height, int channels,int offset, float value , gpu::FilterType filterType)
@@ -66,6 +81,13 @@ void getSetupConfig(unsigned int problemSize, struct Setup* setup)
   threads = threads <= MAX_THREADS ? threads : MAX_THREADS;
   
   int blocks = (problemSize)/threads;
+	std::cout << "inside setup config, blocks: " << blocks << std::endl;
+	if(problemSize % threads != 0)
+	{
+		blocks +=1;
+	}
+	std::cout << "inside setup config, blocks: " << blocks << std::endl;
+	
   setup->threads = threads;
   setup->blocks = blocks;
 }
@@ -86,8 +108,8 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,int width, int hei
   
   Setup setup;
   getSetupConfig(width*height,&setup);
-  //std::cout << "Blocks: " << setup.blocks << std::endl;
-  //std::cout << "Threads: " << setup.threads << std::endl;
+  std::cout << "Blocks: " << setup.blocks << std::endl;
+  std::cout << "Threads: " << setup.threads << std::endl;
 
   unsigned char *d_data;
   cudaMalloc((void**)&d_data,sizeData);
@@ -96,10 +118,11 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,int width, int hei
   unsigned char* d_result;
   cudaMalloc((void**)&d_result,sizeData);
   
-  int sizeSharedMem = problemSize;
   int offset = width*height;
-  callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
-                            d_data,d_result,width,height,channels,offset, BRIGHTNESS_VALUE, gpu::LUMINOUS_FILTER_BRIGHTNESS);
+//  callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
+  //                          d_data,d_result,width,height,channels,offset, BRIGHTNESS_VALUE, gpu::LUMINOUS_FILTER_BRIGHTNESS);
+  callKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
+                            d_data,d_result,width,height,channels,offset,SATURATION_VALUE, gpu::COLORSPACE_FILTER_SATURATION);
   
   cudaMemcpy(h_result,d_result,sizeResult,
              cudaMemcpyDeviceToHost);
@@ -140,7 +163,6 @@ int main(int argc, char* argv[])
     unsigned char* inputBuffer = new unsigned char[imgInfo.spectrum*imgInfo.size];
     unsigned char* outputBuffer = new unsigned char[imgInfo.spectrum*imgInfo.size];
     
-    gpu::ImageProcessing<unsigned char> imp;
     timeval tim;
     
     double dTime1 = gpu::getTime(tim);

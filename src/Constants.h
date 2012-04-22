@@ -18,6 +18,9 @@
 #define S_VALUE 50
 #define SIGNED_CHAR_MAX 128
 #define MAX_THREADS 256
+#define BRIGHTNESS_VALUE 1.2f
+#define CONTRAST_VALUE 1.5f
+#define SATURATION_VALUE 50.2f
 #define PIXEL_DOMAIN_CHECK(T){if(T>255)T=255;else if (T<0)T=0;}
 
 #endif //gpu_Constants_h

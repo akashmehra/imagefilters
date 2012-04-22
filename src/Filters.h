@@ -14,7 +14,7 @@
 
 #ifdef GCC_COMPILATION
 	#define FUNCTION_PREFIX 
-#elif 
+#else 
 	#define FUNCTION_PREFIX __host__ __device__
 #endif
 
@@ -34,6 +34,8 @@ namespace gpu
   {
     LUMINOUS_FILTER_CONTRAST, 
     LUMINOUS_FILTER_BRIGHTNESS,
+		COLORSPACE_FILTER_SATURATION,
+		COLORSPACE_FILTER_SEPIA,
   };
   
   template<typename T>
@@ -76,10 +78,8 @@ FUNCTION_PREFIX T LuminousFilters<T>::contrast(const T& pixel, float cValue)
     {
       case LUMINOUS_FILTER_CONTRAST:
         return contrast(pixel, value);
-        break;
       case LUMINOUS_FILTER_BRIGHTNESS:
         return brightness(pixel, value);
-        break;
     }
   }
   // Luminous Filters End.
@@ -90,26 +90,48 @@ FUNCTION_PREFIX T LuminousFilters<T>::contrast(const T& pixel, float cValue)
   template <typename T>
   class ColorSpaceFilters
   {
-  public:
-  FUNCTION_PREFIX   void saturation(float sValue, T& pixelR, T& pixelG,T& pixelB,
-                T& pixelOutputR, T& pixelOutputG,T& pixelOutputB);
+
+	public:
+		FUNCTION_PREFIX void apply(T& pixelR, T& pixelG,T& pixelB,
+ 															T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue, FilterType filterType);
+ 
+	private:
+		FUNCTION_PREFIX   void saturation(T& pixelR, T& pixelG,T& pixelB,
+    										            	T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue);
     
-   FUNCTION_PREFIX  void NormalizePixel(float whitePoint,float blackPoint,float outputWhitePoint,
-                        float outputBlackPoint,T& pixel, T& pixelOutput);
+   	FUNCTION_PREFIX  void NormalizePixel(float whitePoint,float blackPoint,float outputWhitePoint,
+                        								float outputBlackPoint,T& pixel, T& pixelOutput);
     
     FUNCTION_PREFIX void ApplyFunctionOnPixel(float *curveFunction,T& pixel,T& pixelOutput);                             
     
-   FUNCTION_PREFIX  void BlackNWhite(T &pixelR,T &pixelG,T &pixelB,T &pixelOutputR,
-              T& pixelOutputG,T& pixelOutputB);
+   	FUNCTION_PREFIX  void BlackNWhite(T &pixelR,T &pixelG,T &pixelB,T &pixelOutputR,
+              												T& pixelOutputG,T& pixelOutputB);
     
-    FUNCTION_PREFIX void Sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
-                  T &pixelOutputG,T &pixelOutputB);
+    FUNCTION_PREFIX void sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
+                								T &pixelOutputG,T &pixelOutputB);
   };
   
-  template<typename T>
-  FUNCTION_PREFIX void ColorSpaceFilters<T>::saturation(float sValue,T& pixelR,T& pixelG,
-                                     T& pixelB,T& pixelOutputR,T& pixelOutputG,
-                                     T& pixelOutputB)
+	template<typename T>
+	FUNCTION_PREFIX void ColorSpaceFilters<T>::apply(T& pixelR, T& pixelG,T& pixelB,
+  													T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue, FilterType filterType)
+	{
+		switch(filterType)
+		{
+			case COLORSPACE_FILTER_SATURATION:
+					saturation(pixelR, pixelG, pixelB,
+                     pixelOutputR, pixelOutputG, pixelOutputB, sValue);
+					break;
+			case COLORSPACE_FILTER_SEPIA:
+		 		sepia(pixelR, pixelG, pixelB,
+	            pixelOutputR, pixelOutputG, pixelOutputB);
+      		break;
+		}
+	}
+	
+	template<typename T>
+  FUNCTION_PREFIX void ColorSpaceFilters<T>::saturation(T& pixelR,T& pixelG,
+                                		    							 T& pixelB,T& pixelOutputR,T& pixelOutputG,
+                                    		 							 T& pixelOutputB,float sValue)
   {
     /***Filter can be implemented inplace.***/
     //sValue can be between -1 and 1.
@@ -185,12 +207,12 @@ FUNCTION_PREFIX T LuminousFilters<T>::contrast(const T& pixel, float cValue)
   }
   
   template<typename T>
-  FUNCTION_PREFIX void ColorSpaceFilters<T>::Sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
+  FUNCTION_PREFIX void ColorSpaceFilters<T>::sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
                             T &pixelOutputG,T &pixelOutputB)                       
   {
     /***Filter can be implemented inplace ***/
     ///BW filter is basically 0.6*R + 0.35*G + 0.5*B
-    ///Sepia we basically add some in RedChannel, and siginficantly less in Green Channel
+    ///sepia we basically add some in RedChannel, and siginficantly less in Green Channel
     
     float temp = 1.25 * pixelR;
     PIXEL_DOMAIN_CHECK(temp);

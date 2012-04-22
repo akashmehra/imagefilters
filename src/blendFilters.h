@@ -1,12 +1,14 @@
-/***BLEND FILTERS ARE PARTICULARLY USEFUL IN COMBINING 
-    IMAGES TOGETHER. MOST OF THE COMMONLY USED PHOTO-
-    APPLICATIONS HAVE 12-14 COMMON BLENDMODES IMPLEMENTED***/
-
-
 /////////////////////////////////////////////////////////////
-/***THESE BLEND MODES WORK ON PREDEFINED BLEND FUNCTIONS ***/
+////BLEND FILTERS ARE PARTICULARLY USEFUL IN COMBINING/////// 
+//////TWO IMAGES TOGETHER. PHOTOSHOP, GIMP IMPLEMENT/////////
+/////////EXACTLY THE SAME WAY AS IMPLEMENTED BELOW///////////
+/////////////////////////////////////////////////////////////
 
-/***REFERENCE::http://inlandstudios.com/en/?p=851*/
+/***THESE BLEND MODES WORK ON PREDEFINED BLEND FUNCTIONS ***/
+/////////////////////////////////////////////////////////////
+/***    REFERENCE::http://inlandstudios.com/en/?p=851    ***/
+/////////////////////////////////////////////////////////////
+
 
 #define ChannelBlend_Normal(B,L)     (B)
 #define ChannelBlend_Lighten(B,L)    (((L > B) ? L:B))
@@ -33,4 +35,50 @@
 
 
 
+#ifndef gpu_FilterTemplates_h
+#define gpu_FilterTemplates_h 
+
+#include "Constants.h" 
+#ifdef GCC_COMPILATION
+	#define FUNCTION_PREFIX 
+#elif 
+	#define FUNCTION_PREFIX __host__ __device__ 
+#endif
+
+
+namespace gpu
+{
+    struct Pixel
+    {
+     unsigned char r;
+     unsigned char g;
+     unsigned char b;
+   };
+ 
+   enum FilterType
+   {
+       BLEND_FILTER_LIGHTEN,
+       BLEND_FILTER_DARKEN,
+       BLEND_FILTER_MULTIPLY,
+       BLEND_FILTER_AVERAGE,
+       BLEND_FILTER_ADD,
+       BLEND_FILTER_SUBTRACT,
+       BLEND_FILTER_DIFFERENCE,
+       BLEND_FILTER_NEGATION,
+       BLEND_FILTER_SCREEN,
+       BLEND_FILTER_EXCLUSION,
+       BLEND_FILTER_OVERLAY,
+       BLEND_FILTER_SOFTLIGHT,
+       BLEND_FILTER_HARDLIGHT,
+       BLEND_FILTER_COLORDODGE,
+       BLEND_FILTER_COLORBURN,
+       BLEND_FILTER_LINEARDODGE,
+       BLEND_FILTER_LINEARBURN,
+       BLEND_FILTER_LINEARLIGHT,
+       BLEND_FILTER_VIVIDLIGHT,
+       BLEND_FILTER_PINLIGHT,
+       BLEND_FILTER_HARDMIX
+	 };
+
+}
 

@@ -11,13 +11,13 @@
 #include "Constants.h"
 using namespace cimg_library;
 
-template<typename T>
+/*template<typename T>
 __device__ T brightness(const T& pixel, float bValue)
 {
 	int val = (int)(pixel*bValue);
   PIXEL_DOMAIN_CHECK(val);
   return val;
-}
+}*/
 
 template <typename T>
 __global__ void imageKernel(T* inputBuffer, T* outputBuffer, int width, 
@@ -27,9 +27,10 @@ __global__ void imageKernel(T* inputBuffer, T* outputBuffer, int width,
   int redChannelOffset = blockIdx.x * blockDim.x + threadIdx.x;
   int greenChannelOffset = redChannelOffset + 1*offset;
   int blueChannelOffset = redChannelOffset + 2*offset;
-  outputBuffer[redChannelOffset] =   brightness(inputBuffer[redChannelOffset],1.2);
-  outputBuffer[greenChannelOffset] = brightness(inputBuffer[greenChannelOffset],1.2);
-  outputBuffer[blueChannelOffset] =  brightness(inputBuffer[blueChannelOffset],1.2);
+	LuminousFilters<T> luminousFilters;
+  outputBuffer[redChannelOffset] =   luminousFilters.brightness(inputBuffer[redChannelOffset],1.2);
+  outputBuffer[greenChannelOffset] = luminousFilters.brightness(inputBuffer[greenChannelOffset],1.2);
+  outputBuffer[blueChannelOffset] =  luminousFilters.brightness(inputBuffer[blueChannelOffset],1.2);
   __syncthreads();
 }
 

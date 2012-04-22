@@ -35,6 +35,7 @@
 		0851FDC315414AEC009E2100 /* Filters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Filters.h; sourceTree = "<group>"; };
 		0851FDC415414AEC009E2100 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		0851FDC815414C6D009E2100 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../usr/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
+		08E7BDF4154393A4006F654B /* gpuProcessImage.cu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = gpuProcessImage.cu; path = ../../src/gpuProcessImage.cu; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +80,7 @@
 		0851FDC615414AF6009E2100 /* HEADERS */ = {
 			isa = PBXGroup;
 			children = (
+				08E7BDF4154393A4006F654B /* gpuProcessImage.cu */,
 				0851FDBF15414AEC009E2100 /* CImg.h */,
 				0851FDC015414AEC009E2100 /* Constants.h */,
 				0851FDC215414AEC009E2100 /* cpuProcessImage.h */,
@@ -266,6 +268,7 @@
 				0851FDBE15414ACF009E2100 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

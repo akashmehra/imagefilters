@@ -11,6 +11,14 @@
 
 #include "Constants.h"
 
+
+#ifdef GCC_COMPILATION
+	#define FUNCTION_PREFIX 
+#elif 
+	#define FUNCTION_PREFIX __host__ __device__
+#endif
+
+
 namespace gpu 
 {
   
@@ -40,8 +48,8 @@ namespace gpu
     T apply(const T& pixel,float value, FilterType filterType);
   };
   
-  template<typename T>
-  T LuminousFilters<T>::contrast(const T& pixel, float cValue)
+template<typename T>
+FUNCTION_PREFIX T LuminousFilters<T>::contrast(const T& pixel, float cValue)
   {
     if(cValue > 1)
     {
@@ -54,7 +62,7 @@ namespace gpu
   }
   
   template<typename T>
-  T LuminousFilters<T>::brightness(const T& pixel, float bValue)
+  FUNCTION_PREFIX T LuminousFilters<T>::brightness(const T& pixel, float bValue)
   {
     int val = (int)(pixel*bValue);
     PIXEL_DOMAIN_CHECK(val);
@@ -62,7 +70,7 @@ namespace gpu
   }
   
   template<typename T>
-  T LuminousFilters<T>::apply(const T& pixel, float value, FilterType filterType) 
+  FUNCTION_PREFIX T LuminousFilters<T>::apply(const T& pixel, float value, FilterType filterType) 
   {
     switch(filterType)
     {
@@ -83,23 +91,23 @@ namespace gpu
   class ColorSpaceFilters
   {
   public:
-    void saturation(float sValue, T& pixelR, T& pixelG,T& pixelB,
+  FUNCTION_PREFIX   void saturation(float sValue, T& pixelR, T& pixelG,T& pixelB,
                 T& pixelOutputR, T& pixelOutputG,T& pixelOutputB);
     
-    void NormalizePixel(float whitePoint,float blackPoint,float outputWhitePoint,
+   FUNCTION_PREFIX  void NormalizePixel(float whitePoint,float blackPoint,float outputWhitePoint,
                         float outputBlackPoint,T& pixel, T& pixelOutput);
     
-    void ApplyFunctionOnPixel(float *curveFunction,T& pixel,T& pixelOutput);                             
+    FUNCTION_PREFIX void ApplyFunctionOnPixel(float *curveFunction,T& pixel,T& pixelOutput);                             
     
-    void BlackNWhite(T &pixelR,T &pixelG,T &pixelB,T &pixelOutputR,
+   FUNCTION_PREFIX  void BlackNWhite(T &pixelR,T &pixelG,T &pixelB,T &pixelOutputR,
               T& pixelOutputG,T& pixelOutputB);
     
-    void Sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
+    FUNCTION_PREFIX void Sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
                   T &pixelOutputG,T &pixelOutputB);
   };
   
   template<typename T>
-  void ColorSpaceFilters<T>::saturation(float sValue,T& pixelR,T& pixelG,
+  FUNCTION_PREFIX void ColorSpaceFilters<T>::saturation(float sValue,T& pixelR,T& pixelG,
                                      T& pixelB,T& pixelOutputR,T& pixelOutputG,
                                      T& pixelOutputB)
   {
@@ -146,7 +154,7 @@ namespace gpu
   }
   
   template<typename T>
-  void ColorSpaceFilters<T>::NormalizePixel(float whitePoint,float blackPoint,float outputWhitePoint,
+  FUNCTION_PREFIX void ColorSpaceFilters<T>::NormalizePixel(float whitePoint,float blackPoint,float outputWhitePoint,
                                   float outputBlackPoint,T& pixel,T& pixelOutput)
   {
     /***Filter can be implemented inplace.***/
@@ -157,7 +165,7 @@ namespace gpu
   } 
   
   template<typename T>
-  void ColorSpaceFilters<T>::ApplyFunctionOnPixel(float *curveFunction,T& pixel,T& pixelOutput)
+  FUNCTION_PREFIX void ColorSpaceFilters<T>::ApplyFunctionOnPixel(float *curveFunction,T& pixel,T& pixelOutput)
   {
     /***Filter can be implemented inplace. ***/
     ///Curve function defines the the output values from 0-255 got after Spline fitting
@@ -167,7 +175,7 @@ namespace gpu
   }
   
   template<typename T>
-  void ColorSpaceFilters<T>::BlackNWhite(T &pixelR,T &pixelG, T &pixelB,T &pixelOutputR,
+  FUNCTION_PREFIX void ColorSpaceFilters<T>::BlackNWhite(T &pixelR,T &pixelG, T &pixelB,T &pixelOutputR,
                          T& pixelOutputG,T& pixelOutputB)
   {
     /***Filter can be implemented inplace ***/
@@ -177,7 +185,7 @@ namespace gpu
   }
   
   template<typename T>
-  void ColorSpaceFilters<T>::Sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
+  FUNCTION_PREFIX void ColorSpaceFilters<T>::Sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
                             T &pixelOutputG,T &pixelOutputB)                       
   {
     /***Filter can be implemented inplace ***/

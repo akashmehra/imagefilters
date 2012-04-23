@@ -49,11 +49,13 @@ int main(int argc, char* argv[])
     gpu::unroll(image,imgInfo.width,imgInfo.height,imgInfo.spectrum,
                 inputBuffer);
    
-		imp.adjustBrightness(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, BRIGHTNESS_VALUE); 
+    imp.applyLuminousFilter(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, BRIGHTNESS_VALUE,LUMINOUS_FILTER_BRIGHTNESS); 
     double dTime2 = gpu::getTime(tim);
     std::cout << "time taken for brightness: " << dTime2 - dTime1 << std::endl;
-    imp.saturation(S_VALUE,outputBuffer, outputBuffer, 
-                   imgInfo.width, imgInfo.height, imgInfo.spectrum);
+    
+      
+    //imp.saturation(S_VALUE,outputBuffer, outputBuffer, 
+    //               imgInfo.width, imgInfo.height, imgInfo.spectrum);
     
     CImg<unsigned char> outputImage(outputBuffer,imgInfo.width,imgInfo.height,1,
                                     imgInfo.spectrum,0);

@@ -56,91 +56,77 @@ namespace gpu
     ColorSpaceFilters<T> colorSpaceFilter;
   public:
     
-    void adjustContrast(T *inputBuffer, T *outputBuffer, int imageWidth,
-                        int imageHeight, int spectrum, float value);
-    void adjustBrightness(T *inputBuffer, T *outputBuffer, int imageWidth,
-                          int imageHeight, int spectrum, float value); 
-    void sepia(T *inputBuffer, T *outputBuffer, int imageWidth,
-               int imageHeight, int spectrum);
-    void saturation(float sValue,T *inputBuffer, T *outputBuffer, 
-                    int imageWidth, int imageHeight, int spectrum);  
+    void applyLuminousFilter    (T *inputBuffer,
+                                 T *outputBuffer, 
+                                 int imageWidth,
+                                 int imageHeight, 
+                                 int spectrum, 
+                                 float value,
+                                 gpu::LuminousFilterTypes filterType);  
+
+     
+    void applyColorSpaceFilter  (T *inputBuffer, 
+                                 T *outputBuffer, 
+                                 int imageWidth,
+                                 int imageHeight, 
+                                 int spectrum,
+                                 float value,
+                                 gpu::ColorSpaceFilterTypes filterType);   
+      
+      
+      
+      
+    /*void applyBlendFilter       (T *baseBuffer, 
+                                 T *blendBuffer,
+                                 T *destinationBuffer, 
+                                 int imageWidth,
+                                 int imageHeight,
+                                 int spectrum,
+                                 float alpha,
+                                 BlendType filterType);*/   
+      
   };
-  
-  template <typename T>
-  void ImageProcessing<T>::adjustContrast(T *inputBuffer, T *outputBuffer, int imageWidth,
-                                          int imageHeight, int spectrum,float value)                                       
-  {
-    for(int channel = 0; channel < spectrum ; ++channel)
+    
+  void ImageProcessing<T>::applyLuminousFilter(T *inputBuffer, 
+                                               T *outputBuffer, 
+                                               int imageWidth,
+                                               int imageHeight, 
+                                               int spectrum,
+                                               float value,
+                                               gpu::LuminousFilterTypes filterType)                                       
     {
-      for(int j = 0; j < imageWidth; ++j)
-      {
-        for(int i = 0; i < imageHeight; ++i)
+        for(int channel = 0; channel < spectrum ; ++channel)
         {
-          int k = channel*imageWidth*imageHeight +  i * imageWidth + j;
-          outputBuffer[k] = luminousFilter.apply(inputBuffer[k], value, LUMINOUS_FILTER_CONTRAST);
+            for(int j = 0; j < imageWidth; ++j)
+            {
+                for(int i = 0; i < imageHeight; ++i)
+                {
+                    int k = channel*imageWidth*imageHeight +  i * imageWidth + j;
+                    outputBuffer[k] = luminousFilter.apply(inputBuffer[k], value, filterType);
+                }
+            }
         }
-      }
     }
-  }
-  
-  template <typename T>
-  void ImageProcessing<T>::adjustBrightness(T *inputBuffer, T *outputBuffer, int imageWidth,
-                                          int imageHeight, int spectrum,float value)                                       
-  {
-    for(int channel = 0; channel < spectrum ; ++channel)
+    
+    void ImageProcessing<T>::applyColorSpaceFilter(T *inputBuffer, 
+                                                   T *outputBuffer, 
+                                                   int imageWidth,
+                                                   int imageHeight, 
+                                                   int spectrum,
+                                                    float value,
+                                                   gpu::ColorSpaceFilters filterType)                                       
     {
-      for(int j = 0; j < imageWidth; ++j)
-      {
-        for(int i = 0; i < imageHeight; ++i)
+        for(int channel = 0; channel < spectrum ; ++channel)
         {
-          int k = channel*imageWidth*imageHeight +  i * imageWidth + j;
-          outputBuffer[k] = luminousFilter.apply(inputBuffer[k], value, LUMINOUS_FILTER_BRIGHTNESS);
+            for(int j = 0; j < imageWidth; ++j)
+            {
+                for(int i = 0; i < imageHeight; ++i)
+                {
+                    int k = channel*imageWidth*imageHeight +  i * imageWidth + j;
+                    outputBuffer[k] = colorSpaceFilter.apply(inputBuffer[k], value, filterType);
+                }
+            }
         }
-      }
     }
-  }
-  
-  template <typename T>
-  void ImageProcessing<T>::sepia(T *inputBuffer, T *outputBuffer, 
-                                int imageWidth, int imageHeight, int spectrum)  
-  {
-    if(spectrum == 3)
-    {
-      for(int j = 0; j < imageWidth; ++j)
-      {
-        for(int i = 0; i < imageHeight; ++i)
-        {
-          int redChannel = 0*imageWidth*imageHeight +  i * imageWidth + j;
-          int greenChannel = 1*imageWidth*imageHeight +  i * imageWidth + j;
-          int blueChannel = 2*imageWidth*imageHeight +  i * imageWidth + j;
-          
-          colorSpaceFilter.sepia(inputBuffer[redChannel],inputBuffer[greenChannel],inputBuffer[blueChannel],
-                                 outputBuffer[redChannel],outputBuffer[greenChannel],outputBuffer[blueChannel]);
-        }
-      }
-    }
-  }
-  
-  template <typename T>
-  void ImageProcessing<T>::saturation(float sValue, T *inputBuffer, T *outputBuffer, 
-                                      int imageWidth, int imageHeight, int spectrum)  
-  {
-    if(spectrum == 3)
-    {
-      for(int j = 0; j < imageWidth; ++j)
-      {
-        for(int i = 0; i < imageHeight; ++i)
-        {
-          int redChannel = 0*imageWidth*imageHeight +  i * imageWidth + j;
-          int greenChannel = 1*imageWidth*imageHeight +  i * imageWidth + j;
-          int blueChannel = 2*imageWidth*imageHeight +  i * imageWidth + j;
-          
-          colorSpaceFilter.saturation(inputBuffer[redChannel],inputBuffer[greenChannel],
-                                      inputBuffer[blueChannel],outputBuffer[redChannel],
-                                      outputBuffer[greenChannel],outputBuffer[blueChannel],sValue);
-        }
-      }
-    }
-  }
   
 }

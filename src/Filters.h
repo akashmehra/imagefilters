@@ -29,27 +29,41 @@ namespace gpu
     unsigned char b;
   };
   
-  // Luminous Filters Begin
-  enum FilterType
+  //////////////////////////////////////////////
+  ////LUMINOUS FILTERS
+  //////////////////////////////////////////////
+  enum LuminousFilterTypes
   {
     LUMINOUS_FILTER_CONTRAST, 
     LUMINOUS_FILTER_BRIGHTNESS,
-		COLORSPACE_FILTER_SATURATION,
-		COLORSPACE_FILTER_SEPIA,
+  };
+    
+  enum ColorSpaceFilterTypes
+  {
+    COLORSPACE_FILTER_SATURATION,
+    COLORSPACE_FILTER_SEPIA,
   };
   
   template<typename T>
   class LuminousFilters
   {
-  private:
-    T contrast(const T& pixel, float cValue);
-    T brightness(const T& pixel, float bValue);
-    float cValue, bValue;
-    FilterType filterType;
-  public:
-    T apply(const T& pixel,float value, FilterType filterType);
+    //////////////////////////////////////////////
+    private:
+      LuminousFilterTypes filterType;
+      T contrast(const T& pixel, float cValue);
+      T brightness(const T& pixel, float bValue);
+      float cValue, bValue;
+    //////////////////////////////////////////////
+    public:
+      T apply(const T& pixel,
+              float value, 
+              LuminousFilterTypes filterType);
+    //////////////////////////////////////////////
   };
-  
+ 
+  //////////////////////////////////////////////
+  ///LUMINOUS FILTER TYPE CONTRAST TEMPLATE
+  ///cValue Range:
   template<typename T>
   FUNCTION_PREFIX T LuminousFilters<T>::contrast(const T& pixel, float cValue)
   {
@@ -62,7 +76,10 @@ namespace gpu
     PIXEL_DOMAIN_CHECK(val);
     return val;
   }
-  
+    
+  //////////////////////////////////////////////
+  ///LUMINOUS FILTER TYPE BRIGHTNESS TEMPLATE
+  ///bValue Range:
   template<typename T>
   FUNCTION_PREFIX T LuminousFilters<T>::brightness(const T& pixel, float bValue)
   {
@@ -71,60 +88,111 @@ namespace gpu
     return val;
   }
   
+    
+    
   template<typename T>
-  FUNCTION_PREFIX T LuminousFilters<T>::apply(const T& pixel, float value, FilterType filterType) 
+  FUNCTION_PREFIX T LuminousFilters<T>::apply(const T& pixel, float value, LuminousFilterTypes filterType) 
   {
     switch(filterType)
     {
-      case LUMINOUS_FILTER_CONTRAST:
-        return contrast(pixel, value);
-      case LUMINOUS_FILTER_BRIGHTNESS:
-        return brightness(pixel, value);
+      case LUMINOUS_FILTER_CONTRAST:    return contrast(pixel, value);
+      case LUMINOUS_FILTER_BRIGHTNESS:  return brightness(pixel, value);
     }
   }
-  // Luminous Filters End.
+  //////////////////////////////////////////////
+  ///LUMINOUS FILTERS END  
+  //////////////////////////////////////////////
+
   
-  
-  
-  // ColorSpace Filters Begin.
+   //////////////////////////////////////////////
+   ///COLORSPACE FILTERS  
+   //////////////////////////////////////////////  
   template <typename T>
   class ColorSpaceFilters
   {
-    
+    //////////////////////////////////////////////  
+    private:
+      //////////////////////////////////////////////
+      ///COLORSPACE FILTER TYPE SATURATION
+      ///sValue Range:
+      FUNCTION_PREFIX void saturation(T& pixelR, 
+                                      T& pixelG,
+                                      T& pixelB,
+                                      T& pixelOutputR,
+                                      T& pixelOutputG,
+                                      T& pixelOutputB,
+                                      float sValue);
+      
+      //////////////////////////////////////////////
+      ///COLORSPACE FILTER TYPE NORMALIZE
+      ///POINT RANGES:0-255;
+      FUNCTION_PREFIX void NormalizePixel(float whitePoint,
+                                          float blackPoint,
+                                          float outputWhitePoint,
+                                          float outputBlackPoint,
+                                          T& pixel, 
+                                          T& pixelOutput);
+      
+      //////////////////////////////////////////////
+      ///COLORSPACE FILTER TYPE FUNCTION
+      FUNCTION_PREFIX void ApplyFunctionOnPixel(float *curveFunction,
+                                                T& pixel,
+                                                T& pixelOutput); 
+      
+      //////////////////////////////////////////////
+      ///COLORSPACE FILTER TYPE BW
+      FUNCTION_PREFIX void BlackNWhite(T &pixelR,
+                                       T &pixelG,
+                                       T &pixelB,
+                                       T &pixelOutputR,
+                                       T& pixelOutputG,
+                                       T& pixelOutputB);
+      
+      //////////////////////////////////////////////
+      ///COLORSPACE FILTER TYPE SEPIA
+      FUNCTION_PREFIX void sepia(T &pixelR, 
+                                 T &pixelG,
+                                 T &pixelB,
+                                 T &pixelOutputR,
+                                 T &pixelOutputG,
+                                 T &pixelOutputB);
+      
+      
 	public:
 		FUNCTION_PREFIX void apply(T& pixelR, T& pixelG,T& pixelB,
                                T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue, FilterType filterType);
-    
-	
-		FUNCTION_PREFIX void saturation(T& pixelR, T& pixelG,T& pixelB,
-                                    T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue);
-    
-   	FUNCTION_PREFIX void NormalizePixel(float whitePoint,float blackPoint,float outputWhitePoint,
-                                        float outputBlackPoint,T& pixel, T& pixelOutput);
-    
-    FUNCTION_PREFIX void ApplyFunctionOnPixel(float *curveFunction,T& pixel,T& pixelOutput);                             
-    
-   	FUNCTION_PREFIX void BlackNWhite(T &pixelR,T &pixelG,T &pixelB,T &pixelOutputR,
-                                     T& pixelOutputG,T& pixelOutputB);
-    
-    FUNCTION_PREFIX void sepia(T &pixelR, T &pixelG,T &pixelB,T &pixelOutputR,
-                               T &pixelOutputG,T &pixelOutputB);
+
   };
   
 	template<typename T>
-	FUNCTION_PREFIX void ColorSpaceFilters<T>::apply(T& pixelR, T& pixelG,T& pixelB,
-                                                   T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,
-                                                   float sValue, FilterType filterType)
+	FUNCTION_PREFIX void ColorSpaceFilters<T>::apply(T& pixelR, 
+                                                     T& pixelG,
+                                                     T& pixelB,
+                                                     T& pixelOutputR, 
+                                                     T& pixelOutputG,
+                                                     T& pixelOutputB,
+                                                     float sValue,
+                                                     ColorSpaceFilters filterType)
 	{
-		switch(filterType)
+		switch(ColorSpaceFilters)
 		{
-			case COLORSPACE_FILTER_SATURATION:
-        saturation(pixelR, pixelG, pixelB,
-                   pixelOutputR, pixelOutputG, pixelOutputB, sValue);
+        case COLORSPACE_FILTER_SATURATION:
+        saturation(pixelR,
+                   pixelG, 
+                   pixelB,
+                   pixelOutputR,
+                   pixelOutputG, 
+                   pixelOutputB,
+                   sValue);
         break;
-			case COLORSPACE_FILTER_SEPIA:
-		 		sepia(pixelR, pixelG, pixelB,
-	            pixelOutputR, pixelOutputG, pixelOutputB);
+                
+        case COLORSPACE_FILTER_SEPIA:
+		sepia(pixelR, 
+              pixelG, 
+              pixelB,
+              pixelOutputR, 
+              pixelOutputG, 
+              pixelOutputB);
         break;
 		}
 	}

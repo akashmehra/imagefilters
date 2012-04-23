@@ -114,7 +114,7 @@ namespace gpu
           int greenChannel = 1*imageWidth*imageHeight +  i * imageWidth + j;
           int blueChannel = 2*imageWidth*imageHeight +  i * imageWidth + j;
           
-          colorSpaceFilter.Sepia(inputBuffer[redChannel],inputBuffer[greenChannel],inputBuffer[blueChannel],
+          colorSpaceFilter.sepia(inputBuffer[redChannel],inputBuffer[greenChannel],inputBuffer[blueChannel],
                                  outputBuffer[redChannel],outputBuffer[greenChannel],outputBuffer[blueChannel]);
         }
       }
@@ -135,9 +135,9 @@ namespace gpu
           int greenChannel = 1*imageWidth*imageHeight +  i * imageWidth + j;
           int blueChannel = 2*imageWidth*imageHeight +  i * imageWidth + j;
           
-          colorSpaceFilter.saturation(sValue,inputBuffer[redChannel],inputBuffer[greenChannel],
+          colorSpaceFilter.saturation(inputBuffer[redChannel],inputBuffer[greenChannel],
                                       inputBuffer[blueChannel],outputBuffer[redChannel],
-                                      outputBuffer[greenChannel],outputBuffer[blueChannel]);
+                                      outputBuffer[greenChannel],outputBuffer[blueChannel],sValue);
         }
       }
     }

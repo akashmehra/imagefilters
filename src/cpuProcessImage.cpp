@@ -19,7 +19,7 @@ void printMetaData(const gpu::Image& image)
 
 int main(int argc, char* argv[])
 {
-  cimg::imagemagick_path("/opt/local/bin/convert");
+//  cimg::imagemagick_path("/opt/local/bin/convert");
   if(argc == 3)
   {
     std::string filename = argv[1];
@@ -48,15 +48,18 @@ int main(int argc, char* argv[])
     
     gpu::unroll(image,imgInfo.width,imgInfo.height,imgInfo.spectrum,
                 inputBuffer);
-    
-    imp.saturation(S_VALUE,inputBuffer, outputBuffer, 
+   
+		imp.adjustBrightness(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, BRIGHTNESS_VALUE); 
+    double dTime2 = gpu::getTime(tim);
+    std::cout << "time taken for brightness: " << dTime2 - dTime1 << std::endl;
+    imp.saturation(S_VALUE,outputBuffer, outputBuffer, 
                    imgInfo.width, imgInfo.height, imgInfo.spectrum);
     
     CImg<unsigned char> outputImage(outputBuffer,imgInfo.width,imgInfo.height,1,
                                     imgInfo.spectrum,0);
     
-    double dTime2 = gpu::getTime(tim);
-    std::cout << "time taken for unrolled version: " << dTime2 - dTime1 << std::endl;
+    double dTime3 = gpu::getTime(tim);
+    std::cout << "time taken for saturation: " << dTime3 - dTime2 << std::endl;
     
     outputImage.save_jpeg(outputFilename.c_str());
     CImgDisplay darkDisplay(outputImage,"Output Image",0);

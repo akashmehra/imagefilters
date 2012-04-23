@@ -95,7 +95,7 @@ namespace gpu
 		FUNCTION_PREFIX void apply(T& pixelR, T& pixelG,T& pixelB,
                                T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue, FilterType filterType);
     
-	private:
+	
 		FUNCTION_PREFIX void saturation(T& pixelR, T& pixelG,T& pixelB,
                                     T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue);
     

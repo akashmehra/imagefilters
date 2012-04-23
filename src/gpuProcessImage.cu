@@ -130,10 +130,10 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,int width, int hei
   cudaMalloc((void**)&d_result,sizeData);
   
   int offset = width*height;
-  //  callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
-  //                          d_data,d_result,width,height,channels,offset, BRIGHTNESS_VALUE, gpu::LUMINOUS_FILTER_BRIGHTNESS);
+   callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
+                            d_data,d_result,width,height,channels,offset, BRIGHTNESS_VALUE, gpu::LUMINOUS_FILTER_BRIGHTNESS);
   callKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
-                            d_data,d_result,width,height,channels,offset,
+                            d_result,d_result,width,height,channels,offset,
                             SATURATION_VALUE, gpu::COLORSPACE_FILTER_SATURATION);
   
   cudaMemcpy(h_result,d_result,sizeResult,

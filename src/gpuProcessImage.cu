@@ -11,66 +11,91 @@
 #include "Constants.h"
 using namespace cimg_library;
 
-__device__ void calculateChannelOffsets(int offset, int blockIndex, int blockDimension, 
-                                        int threadIndex,int* redChannelOffset, 
-                                        int* greenChannelOffset, int* blueChannelOffset)
+__device__ void calculateChannelOffsets(int offset, int blockIndex,
+																				int blockDimension,int threadIndex,
+																				int* rOffset,
+																				int* gOffset,
+																				int* bOffset)
 {
-	*redChannelOffset = blockIndex * blockDimension + threadIndex;
-	*greenChannelOffset = *redChannelOffset + 1*offset;
-	*blueChannelOffset = *redChannelOffset + 2*offset;
+	*rOffset = blockIndex * blockDimension + threadIndex;
+	*gOffset = *rOffset + 1*offset;
+	*bOffset = *rOffset + 2*offset;
+}
+template <typename T>
+__global__ void luminousFilterKernel(T* inputBuffer, T* outputBuffer,
+																		 int width,int height,int channels,
+																		 int offset,float value, 
+                                     gpu::FilterType filterType)
+{
+  
+ 	int rOffset, gOffset, bOffset; 
+  calculateChannelOffsets(offset, blockIdx.x, blockDim.x, threadIdx.x, 
+													&rOffset,&gOffset,&bOffset);
+  
+	gpu::LuminousFilters<T> luminousFilters;
+  outputBuffer[rOffset] = luminousFilters.apply(inputBuffer[rOffset],value,
+																								filterType);
+  outputBuffer[gOffset] = luminousFilters.apply(inputBuffer[gOffset],value,
+																								filterType);
+  outputBuffer[bOffset] = luminousFilters.apply(inputBuffer[bOffset],value,
+																								filterType);
+  __syncthreads();
 }
 
 
+
 template <typename T>
-__global__ void colorspaceFilterKernel(T* inputBuffer, T* outputBuffer, int width, 
-                                       int height, int channels,int offset, 
-                                       float value, gpu::FilterType filterType)
+__global__ void colorspaceFilterKernel(T* inputBuffer, T* outputBuffer,
+																			 int width,int height, int channels,
+																			 int offset,float value,
+																			 gpu::FilterType filterType)
 {
   
- 	int redChannelOffset, greenChannelOffset, blueChannelOffset;
+ 	int rOffset, gOffset, bOffset;
   
   calculateChannelOffsets(offset,blockIdx.x,blockDim.x,threadIdx.x,
-                          &redChannelOffset, &greenChannelOffset, &blueChannelOffset);
+                          &rOffset, &gOffset, 
+													&bOffset);
   
 	gpu::ColorSpaceFilters<T> colorSpaceFilters;
   
-  colorSpaceFilters.apply(inputBuffer[redChannelOffset],inputBuffer[greenChannelOffset],
-                          inputBuffer[blueChannelOffset], outputBuffer[redChannelOffset],
-                          outputBuffer[greenChannelOffset],outputBuffer[blueChannelOffset],
+  colorSpaceFilters.apply(inputBuffer[rOffset],
+													inputBuffer[gOffset],
+                          inputBuffer[bOffset], 
+													outputBuffer[rOffset],
+                          outputBuffer[gOffset],
+													outputBuffer[bOffset],
                           value,filterType);
   __syncthreads();
 }
 
 template <typename T>
-__global__ void luminousFilterKernel(T* inputBuffer, T* outputBuffer, int width, 
-                                     int height, int channels,int offset, float value , 
-                                     gpu::FilterType filterType)
+__global__ void blendFilterKernel(T* baseBuffer, T* blendBuffer, 
+																	T* outputBuffer,int width,int height, 
+																	int channels,int offset,float value, 
+																	gpu::BlendType filterType)
 {
   
- 	int redChannelOffset, greenChannelOffset, blueChannelOffset; 
-  calculateChannelOffsets(offset, blockIdx.x, blockDim.x, threadIdx.x, &redChannelOffset, &greenChannelOffset, &blueChannelOffset);
+ 	int rOffset, gOffset, bOffset;
   
-	gpu::LuminousFilters<T> luminousFilters;
-  outputBuffer[redChannelOffset] =   luminousFilters.apply(inputBuffer[redChannelOffset],value,filterType);
-  outputBuffer[greenChannelOffset] = luminousFilters.apply(inputBuffer[greenChannelOffset],value,filterType);
-  outputBuffer[blueChannelOffset] =  luminousFilters.apply(inputBuffer[blueChannelOffset],value,filterType);
+  calculateChannelOffsets(offset,blockIdx.x,blockDim.x,threadIdx.x,
+                          &rOffset,
+													&gOffset,
+													&bOffset);
+  
+	gpu::BlendFilters<T> blendFilters;
+  
+  blendFilters.apply(baseBuffer[rOffset],
+										 baseBuffer[gOffset],
+										 baseBuffer[bOffset],
+  									 blendBuffer[rOffset],
+										 blendBuffer[gOffset],
+										 blendBuffer[bOffset],
+										 outputBuffer[rOffset],
+                     outputBuffer[gOffset],
+										 outputBuffer[bOffset],
+                     value,filterType);
   __syncthreads();
-}
-
-struct Setup
-{
-  int threads;
-  int blocks;
-};
-
-unsigned int powerOf2( unsigned int x ) {
-  --x;
-  x |= x >> 1;
-  x |= x >> 2;
-  x |= x >> 4;
-  x |= x >> 8;
-  x |= x >> 16;
-  return ++x;
 }
 
 template <typename T>
@@ -82,26 +107,26 @@ void callKernel(void(*kernel)(T*,T*,int,int,int,int,float,gpu::FilterType),
 {
   dim3 dimGrid(blocks,1,1);
   dim3 dimBlock(threads,1,1);
-  kernel<<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer, width, height, channels, offset, value,filterType);
+  kernel<<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer, 
+															 width, height, channels, offset, 
+															 value,filterType);
 }
 
-
-void getSetupConfig(unsigned int problemSize, struct Setup* setup)
+template <typename T>
+void callBlendKernel(void(*kernel)(T*,T*,T*,int,int,int,int,float,
+																	gpu::BlendType), 
+                		 int blocks, int threads, 
+          					 T* baseBuffer,T* blendBuffer,T* outputBuffer,
+										 int width, int height, int channels, int offset, 
+                		 float value,gpu::BlendType filterType) 
 {
-  int threads = powerOf2(problemSize);
-  threads = threads <= MAX_THREADS ? threads : MAX_THREADS;
-  
-  int blocks = (problemSize)/threads;
-	std::cout << "inside setup config, blocks: " << blocks << std::endl;
-	if(problemSize % threads != 0)
-	{
-		blocks +=1;
-	}
-	std::cout << "inside setup config, blocks: " << blocks << std::endl;
-	
-  setup->threads = threads;
-  setup->blocks = blocks;
+  dim3 dimGrid(blocks,1,1);
+  dim3 dimBlock(threads,1,1);
+  kernel<<<dimGrid,dimBlock>>>(baseBuffer, blendBuffer,outputBuffer, 
+															 width, height, channels, offset, 
+															 value,filterType);
 }
+
 
 void sendWarmUpSignal(unsigned char* h_data, const unsigned int sizeData)
 {
@@ -111,14 +136,15 @@ void sendWarmUpSignal(unsigned char* h_data, const unsigned int sizeData)
   cudaFree(d_data);
 }
 
-void runKernel(unsigned char* h_data, unsigned char* h_result,int width, int height, int channels)
+void runKernel(unsigned char* h_data, unsigned char* h_result,
+							 int width, int height, int channels)
 {
   int problemSize = width*height*channels;
   int sizeData = problemSize*sizeof(unsigned char);
   int sizeResult = sizeData;
   
-  Setup setup;
-  getSetupConfig(width*height,&setup);
+  gpu::Setup setup;
+  gpu::getSetupConfig(width*height,&setup);
   std::cout << "Blocks: " << setup.blocks << std::endl;
   std::cout << "Threads: " << setup.threads << std::endl;
   
@@ -130,26 +156,36 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,int width, int hei
   cudaMalloc((void**)&d_result,sizeData);
   
   int offset = width*height;
-   callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
-                            d_data,d_result,width,height,channels,offset, BRIGHTNESS_VALUE, gpu::LUMINOUS_FILTER_BRIGHTNESS);
-  callKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
-                            d_result,d_result,width,height,channels,offset,
-                            SATURATION_VALUE, gpu::COLORSPACE_FILTER_SATURATION);
   
-  cudaMemcpy(h_result,d_result,sizeResult,
-             cudaMemcpyDeviceToHost);
+	timeval tim;
+  double dTime1 = gpu::getTime(tim);
+	callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
+                            d_data,d_result,width,height,channels,offset,
+														BRIGHTNESS_VALUE, gpu::LUMINOUS_FILTER_BRIGHTNESS);
+  
+  double dTime2 = gpu::getTime(tim);
+  std::cout << "time taken for brightness on GPU: " << dTime2 - dTime1 << std::endl;
+	callKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
+                            d_result,d_result,width,height,channels,offset,
+                            SATURATION_VALUE,gpu::COLORSPACE_FILTER_SATURATION);
+  
+	
+  double dTime3 = gpu::getTime(tim);
+  std::cout << "time taken for saturation on GPU: " << dTime3 - dTime2 << std::endl;
+	callBlendKernel<unsigned char>(blendFilterKernel,setup.blocks,setup.threads,
+                            d_result,d_result,d_result,width,height,channels,
+														offset,SATURATION_VALUE,
+														gpu::BLEND_FILTER_DARKEN);
+  
+
+  double dTime4 = gpu::getTime(tim);
+  std::cout << "time taken for blend on GPU: " << dTime4 - dTime3 << std::endl;
+  cudaMemcpy(h_result,d_result,sizeResult,cudaMemcpyDeviceToHost);
   
   cudaFree(d_data);
   cudaFree(d_result);
 }
 
-
-void printMetaData(const gpu::Image& image)
-{
-  std::cout << "Image Metadata:" << std::endl;
-  std::cout << "width: " << image.width << ", height: " << image.height << 
-  ", size: " << image.size << ", spectrum: " << image.spectrum << std::endl;
-}
 
 int main(int argc, char* argv[])
 {

@@ -5,7 +5,6 @@
 #include "CImg.h"
 
 #include "Filters.h"
-#include "blendFilters.h"
 #include "Constants.h"
 
 using namespace cimg_library;

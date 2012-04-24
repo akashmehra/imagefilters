@@ -33,13 +33,14 @@
  		* */
 
 
-
+  #define maximum(B,L) (((B>L) ? B:L))
+	#define minimum(B,L) (((B<L) ? B:L))
 	#define ChannelBlend_Normal(B,L)     (B)
 	#define ChannelBlend_Lighten(B,L)    (((L > B) ? L:B))
 	#define ChannelBlend_Darken(B,L)     (((L > B) ? B:L))
 	#define ChannelBlend_Multiply(B,L)   (((B * L) / 255))
 	#define ChannelBlend_Average(B,L)    (((B + L) / 2))
-	#define ChannelBlend_Add(B,L)        ((std::min(255, (B + L))))
+	#define ChannelBlend_Add(B,L)        ((minimum(255, (B + L))))
 	#define ChannelBlend_Subtract(B,L)   (((B + L < 255) ? 0:(B + L - 255)))
 	#define ChannelBlend_Difference(B,L) ((abs(B - L)))
 	#define ChannelBlend_Negation(B,L)   ((255 - abs(255 - B - L)))
@@ -51,9 +52,9 @@
 	#define ChannelBlend_SoftLight(B,L)  (((L < 128)?(2*((B>>1)+64))*((float)L/255):(255-(2*(255-((B>>1)+64))*(float)(255-L)/255))))
 	
 	#define ChannelBlend_HardLight(B,L)  (ChannelBlend_Overlay(L,B))
-	#define ChannelBlend_ColorDodge(B,L) (((L == 255) ? L:std::min(255, ((B << 8 ) / (255 - L)))))
+	#define ChannelBlend_ColorDodge(B,L) (((L == 255) ? L:minimum(255, ((B << 8 ) / (255 - L)))))
 
-	#define ChannelBlend_ColorBurn(B,L)  (((L == 0) ? L:std::max(0, (255 - ((255 - B) << 8 ) / L))))
+	#define ChannelBlend_ColorBurn(B,L)  (((L == 0) ? L:maximum(0, (255 - ((255 - B) << 8 ) / L))))
 	
 	#define ChannelBlend_LinearDodge(B,L)(ChannelBlend_Add(B,L))
 	#define ChannelBlend_LinearBurn(B,L) (ChannelBlend_Subtract(B,L))

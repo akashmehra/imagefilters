@@ -173,9 +173,9 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,
   double dTime3 = gpu::getTime(tim);
   std::cout << "time taken for saturation on GPU: " << dTime3 - dTime2 << std::endl;
 	callBlendKernel<unsigned char>(blendFilterKernel,setup.blocks,setup.threads,
-                            d_result,d_result,d_result,width,height,channels,
+                            d_data,d_result,d_result,width,height,channels,
 														offset,SATURATION_VALUE,
-														gpu::BLEND_FILTER_DARKEN);
+														gpu::BLEND_FILTER_LINEARLIGHT);
   
 
   double dTime4 = gpu::getTime(tim);

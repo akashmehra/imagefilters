@@ -10,12 +10,12 @@
 
 using namespace cimg_library;
 
-void printMetaData(const gpu::Image& image)
+/*void printMetaData(const gpu::Image& image)
 {
   std::cout << "Image Metadata:" << std::endl;
   std::cout << "width: " << image.width << ", height: " << image.height << 
   ", size: " << image.size << ", spectrum: " << image.spectrum << std::endl;
-}
+}*/
 
 int main(int argc, char* argv[])
 {

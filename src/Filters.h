@@ -488,19 +488,19 @@ namespace gpu
    template<typename T>
    FUNCTION_PREFIX void BlendFilters<T>::colorDodge(const T& baseLayer,const T& blendLayer, T& destination, float alpha)
    {
-       /*float blendValue=ChannelBlend_ColorDodge(baseLayer,blendLayer);
+       float blendValue=ChannelBlend_ColorDodge(baseLayer,blendLayer);
        float blendValueNormalized=(1.0-alpha)*baseLayer+alpha*blendValue;
        PIXEL_DOMAIN_CHECK(blendValueNormalized);
-       destination=(T)blendValueNormalized;*/
+       destination=(T)blendValueNormalized;
    }
    
    template<typename T>
    FUNCTION_PREFIX void BlendFilters<T>::colorBurn(const T& baseLayer,const T& blendLayer, T& destination, float alpha)
    {
-       /*float blendValue=ChannelBlend_ColorBurn(baseLayer,blendLayer);
+       float blendValue=ChannelBlend_ColorBurn(baseLayer,blendLayer);
        float blendValueNormalized=(1.0-alpha)*baseLayer+alpha*blendValue;
        PIXEL_DOMAIN_CHECK(blendValueNormalized);
-       destination=(T)blendValueNormalized;*/
+       destination=(T)blendValueNormalized;
    }
    
    template<typename T>
@@ -523,19 +523,19 @@ namespace gpu
    template<typename T>
    FUNCTION_PREFIX void BlendFilters<T>::linearLight(const T& baseLayer,const T& blendLayer, T& destination, float alpha)
    {
-       /*float blendValue=ChannelBlend_LinearLight(baseLayer,blendLayer);
+       float blendValue=ChannelBlend_LinearLight(baseLayer,blendLayer);
        float blendValueNormalized=(1.0-alpha)*baseLayer+alpha*blendValue;
        PIXEL_DOMAIN_CHECK(blendValueNormalized);
-       destination=(T)blendValueNormalized;*/
+       destination=(T)blendValueNormalized;
    }
    
    template<typename T>
    FUNCTION_PREFIX void BlendFilters<T>::vividLight(const T& baseLayer,const T& blendLayer, T& destination, float alpha)
    {
-       /*float blendValue=ChannelBlend_VividLight(baseLayer,blendLayer);
+       float blendValue=ChannelBlend_VividLight(baseLayer,blendLayer);
        float blendValueNormalized=(1.0-alpha)*baseLayer+alpha*blendValue;
        PIXEL_DOMAIN_CHECK(blendValueNormalized);
-       destination=(T)blendValueNormalized;*/
+       destination=(T)blendValueNormalized;
    }
    
    template<typename T>
@@ -550,10 +550,10 @@ namespace gpu
    template<typename T>
    FUNCTION_PREFIX void BlendFilters<T>::hardMix(const T& baseLayer,const T& blendLayer, T& destination, float alpha)
    {
-       /*float blendValue=ChannelBlend_HardMix(baseLayer,blendLayer);
+       float blendValue=ChannelBlend_HardMix(baseLayer,blendLayer);
        float blendValueNormalized=(1.0-alpha)*baseLayer+alpha*blendValue;
        PIXEL_DOMAIN_CHECK(blendValueNormalized);
-       destination=(T)blendValueNormalized;*/
+       destination=(T)blendValueNormalized;
    }
    
    template<typename T>

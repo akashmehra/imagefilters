@@ -53,8 +53,8 @@ namespace gpu
   class ImageProcessing
   {
   private:
-    LuminousFilters<T> luminousFilter;
-    ColorSpaceFilters<T> colorSpaceFilter;
+		LuminousFilters<T> luminousFilter;
+		ColorSpaceFilters<T> colorSpaceFilter;
     BlendFilters<T> blendFilter;
   public:
     
@@ -64,7 +64,7 @@ namespace gpu
                                  int imageHeight, 
                                  int spectrum, 
                                  float value,
-                                 gpu::LuminousFilterTypes filterType);  
+                                 gpu::FilterType filterType);  
 
      
     void applyColorSpaceFilter  (T *inputBuffer, 
@@ -73,7 +73,7 @@ namespace gpu
                                  int imageHeight, 
                                  int spectrum,
                                  float value,
-                                 gpu::ColorSpaceFilterTypes filterType);  
+                                 gpu::FilterType filterType);  
       
     void applyBlendFilter       (T *baseBuffer, 
                                  T *blendBuffer, 
@@ -82,7 +82,7 @@ namespace gpu
                                  int imageHeight, 
                                  int spectrum,
                                  float value,
-                                 gpu::BlendType filterType);
+                                 gpu::BlendType blendType);
   };
 
   template<typename T>
@@ -92,7 +92,7 @@ namespace gpu
                                                int imageHeight, 
                                                int spectrum,
                                                float value,
-                                               gpu::LuminousFilterTypes filterType)                                       
+                                               gpu::FilterType filterType)                                       
     {
         for(int channel = 0; channel < spectrum ; ++channel)
         {
@@ -114,7 +114,7 @@ namespace gpu
                                                    int imageHeight, 
                                                    int spectrum,
                                                    float value,
-                                                   gpu::ColorSpaceFilterTypes filterType)                                       
+                                                   gpu::FilterType filterType)                                       
     {
             for(int j = 0; j < imageWidth; ++j)
             {
@@ -138,7 +138,7 @@ namespace gpu
                                               int imageHeight, 
                                               int spectrum,
                                               float value,
-                                              gpu::BlendType filterType)                                   
+                                              gpu::BlendType blendType)                                   
     {
         //for(int channel = 0; channel < spectrum ; ++channel)
         //{
@@ -152,13 +152,9 @@ namespace gpu
                     
                     blendFilter.apply(baseBuffer[r],baseBuffer[g],baseBuffer[b],
                                            blendBuffer[r],blendBuffer[g],blendBuffer[b],
-                                           destinationBuffer[r],destinationBuffer[g],destinationBuffer[b],value,filterType);
+                                           destinationBuffer[r],destinationBuffer[g],destinationBuffer[b],value,blendType);
                 }
             }
         //}
     }
-    
-    
-    
-  
 }

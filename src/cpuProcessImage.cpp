@@ -49,22 +49,19 @@ int main(int argc, char* argv[])
     gpu::unroll(image,imgInfo.width,imgInfo.height,imgInfo.spectrum,
                 inputBuffer);
    
-      imp.applyLuminousFilter(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, BRIGHTNESS_VALUE,gpu::LUMINOUS_FILTER_BRIGHTNESS); 
-    double dTime2 = gpu::getTime(tim);
-    std::cout << "time taken for brightness: " << dTime2 - dTime1 << std::endl;
+      //imp.applyLuminousFilter(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, BRIGHTNESS_VALUE,gpu::LUMINOUS_FILTER_BRIGHTNESS); 
     imp.applyColorSpaceFilter(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, S_VALUE,gpu::COLORSPACE_FILTER_SATURATION); 
+    
+		double dTime2 = gpu::getTime(tim);
+    std::cout << "time taken for saturation: " << dTime2 - dTime1 << std::endl;
     
       imp.applyBlendFilter(inputBuffer,inputBuffer,outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, 1.0,gpu::BLEND_FILTER_LINEARLIGHT); 
 
-      
-    //imp.saturation(S_VALUE,outputBuffer, outputBuffer, 
-    //               imgInfo.width, imgInfo.height, imgInfo.spectrum);
-    
     CImg<unsigned char> outputImage(outputBuffer,imgInfo.width,imgInfo.height,1,
                                     imgInfo.spectrum,0);
     
     double dTime3 = gpu::getTime(tim);
-    std::cout << "time taken for saturation: " << dTime3 - dTime2 << std::endl;
+    std::cout << "time taken for blend: " << dTime3 - dTime2 << std::endl;
     
     outputImage.save_jpeg(outputFilename.c_str());
     CImgDisplay darkDisplay(outputImage,"Output Image",0);

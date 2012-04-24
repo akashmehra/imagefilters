@@ -1,5 +1,5 @@
 If you don't have cmake installed then compile by issuing the following command:
-	g++ -o pimg processImage.cpp -O3 -L/usr/X11R6/lib -lm -lpthread -lX11
+	g++ -o pimg processImage.cpp -O3 -L/usr/X11R6/lib -lm -lpthread -lX11 -DGCC_COMPILATION
 
 else:
 	for building out of source:
@@ -19,3 +19,9 @@ For using Xcode:
 	cmake -GXcode ../../
 
 but have to test if it works with Xcode just like that.
+
+
+To run the cuda code:
+	nvcc -o gpuimg gpuProcessImage.cu -L/usr/X11R6/lib -lm -lpthread -lX11
+
+TODO: Prepare a test plan for code profiling after implementing convolution on GPU and canny edge.

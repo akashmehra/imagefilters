@@ -55,9 +55,9 @@ namespace gpu
       float cValue, bValue;
     //////////////////////////////////////////////
     public:
-      T apply(const T& pixel,
-              float value, 
-              LuminousFilterTypes filterType);
+      FUNCTION_PREFIX T apply(const T& pixel,
+                              float value, 
+                              LuminousFilterTypes filterType);
     //////////////////////////////////////////////
   };
  
@@ -160,7 +160,7 @@ namespace gpu
       
 	public:
 		FUNCTION_PREFIX void apply(T& pixelR, T& pixelG,T& pixelB,
-                               T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue, FilterType filterType);
+                               T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue, ColorSpaceFilters filterType);
 
   };
   
@@ -174,7 +174,7 @@ namespace gpu
                                                      float sValue,
                                                      ColorSpaceFilters filterType)
 	{
-		switch(ColorSpaceFilters)
+		switch(filterType)
 		{
         case COLORSPACE_FILTER_SATURATION:
         saturation(pixelR,

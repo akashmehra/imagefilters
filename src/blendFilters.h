@@ -37,8 +37,10 @@
 
 #ifndef gpu_FilterTemplates_h
 #define gpu_FilterTemplates_h 
+#endif
 
 #include "Constants.h" 
+
 #ifdef GCC_COMPILATION
 	#define FUNCTION_PREFIX 
 #elif 
@@ -48,12 +50,6 @@
 
 namespace gpu
 {
-    struct Pixel
-    {
-     unsigned char r;
-     unsigned char g;
-     unsigned char b;
-   };
  
    enum BlendType
    {
@@ -81,7 +77,7 @@ namespace gpu
        BLEND_FILTER_HARDMIX
 	 };
     
-   template<typename T>
+    template<typename T>
     class BlendFilters
     {
     private:
@@ -111,7 +107,10 @@ namespace gpu
         float alpha;
         BlendType blendType;
     public:
-        T apply (const T& baseLayer,const T& blendLayer,T& destination, float alpha, BlendType blendType);
+        FUNCTION_PREFIX void apply(T& pixelBaseR, T& pixelBaseG,T& pixelBaseB,
+                                   T& pixelBlendR,T& pixelBlendG, T& pixelBlendB, 
+                                   T& pixelDestinationR,T& pixelDestinationG,T& pixelDestinationB,
+                                   float alpha,BlendFilters blendType);
     };
 
     template<typename T>
@@ -311,7 +310,7 @@ namespace gpu
     }
     
     template<typename T>
-	FUNCTION_PREFIX void ColorSpaceFilters<T>::apply(T& pixelBaseR, 
+	FUNCTION_PREFIX void BlendFilters<T>::apply(T& pixelBaseR, 
                                                      T& pixelBaseG,
                                                      T& pixelBaseB,
                                                      T& pixelBlendR, 

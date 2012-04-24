@@ -53,6 +53,8 @@ int main(int argc, char* argv[])
     double dTime2 = gpu::getTime(tim);
     std::cout << "time taken for brightness: " << dTime2 - dTime1 << std::endl;
     imp.applyColorSpaceFilter(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, S_VALUE,gpu::COLORSPACE_FILTER_SATURATION); 
+    
+      imp.applyBlendFilter(inputBuffer,inputBuffer,outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, 1.0,gpu::BLEND_FILTER_LINEARLIGHT); 
 
       
     //imp.saturation(S_VALUE,outputBuffer, outputBuffer, 

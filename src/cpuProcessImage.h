@@ -5,7 +5,7 @@
 #include "CImg.h"
 
 #include "Filters.h"
-//#include "blendFilters.h"
+#include "blendFilters.h"
 #include "Constants.h"
 
 using namespace cimg_library;
@@ -55,7 +55,7 @@ namespace gpu
   private:
     LuminousFilters<T> luminousFilter;
     ColorSpaceFilters<T> colorSpaceFilter;
-    //BlendFilters<T> blendFilter;
+    BlendFilters<T> blendFilter;
   public:
     
     void applyLuminousFilter    (T *inputBuffer,
@@ -75,14 +75,14 @@ namespace gpu
                                  float value,
                                  gpu::ColorSpaceFilterTypes filterType);  
       
-    /*void applyBlendFilter       (T *baseBuffer, 
+    void applyBlendFilter       (T *baseBuffer, 
                                  T *blendBuffer, 
                                  T *destinationBuffer, 
                                  int imageWidth,
                                  int imageHeight, 
                                  int spectrum,
                                  float value,
-                                 gpu::BlendType filterType);*/
+                                 gpu::BlendType filterType);
   };
 
   template<typename T>
@@ -114,7 +114,7 @@ namespace gpu
                                                    int imageHeight, 
                                                    int spectrum,
                                                    float value,
-                                                   ColorSpaceFilterTypes filterType)                                       
+                                                   gpu::ColorSpaceFilterTypes filterType)                                       
     {
             for(int j = 0; j < imageWidth; ++j)
             {
@@ -125,12 +125,12 @@ namespace gpu
                     int b = 2*imageWidth*imageHeight +  i * imageWidth + j;
 
                     colorSpaceFilter.apply(inputBuffer[r],inputBuffer[g],inputBuffer[b],
-                                           outputBuffer[r],outputBuffer[g],outputBuffer[b], 23.3f, 0);
+                                           outputBuffer[r],outputBuffer[g],outputBuffer[b], value, filterType);
                 }
             }
     }
     
-    /*template<typename T>
+    template<typename T>
     void ImageProcessing<T>::applyBlendFilter(T *baseBuffer, 
                                               T *blendBuffer, 
                                               T *destinationBuffer, 
@@ -150,13 +150,13 @@ namespace gpu
                     int g = 1*imageWidth*imageHeight +  i * imageWidth + j;
                     int b = 2*imageWidth*imageHeight +  i * imageWidth + j;
                     
-                    colorSpaceFilter.apply(baseBuffer[r],baseBuffer[g],baseBuffer[b],
+                    blendFilter.apply(baseBuffer[r],baseBuffer[g],baseBuffer[b],
                                            blendBuffer[r],blendBuffer[g],blendBuffer[b],
                                            destinationBuffer[r],destinationBuffer[g],destinationBuffer[b],value,filterType);
                 }
             }
         //}
-    }*/
+    }
     
     
     

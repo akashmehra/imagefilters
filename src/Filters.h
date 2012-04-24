@@ -160,7 +160,7 @@ namespace gpu
       
 	public:
 		FUNCTION_PREFIX void apply(T& pixelR, T& pixelG,T& pixelB,
-                               T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue, ColorSpaceFilters filterType);
+                                   T& pixelOutputR, T& pixelOutputG,T& pixelOutputB,float sValue, ColorSpaceFilterTypes filterType);
 
   };
   
@@ -172,7 +172,7 @@ namespace gpu
                                                      T& pixelOutputG,
                                                      T& pixelOutputB,
                                                      float sValue,
-                                                     ColorSpaceFilters filterType)
+                                                     ColorSpaceFilterTypes filterType)
 	{
 		switch(filterType)
 		{

@@ -99,6 +99,38 @@ __global__ void blendFilterKernel(T* baseBuffer, T* blendBuffer,
 }
 
 template <typename T>
+__global__ void convolutionFilterKernel(T* inputBuffer, T* outputBuffer, 
+																				int* kernel,int width,int height,
+																				int kernelSize,int normal,
+																				int offset)
+{
+	int rOffset, gOffset, bOffset;
+	calculateChannelOffsets(offset, blockIdx.x, blockDim.x, threadIdx.x,
+													&rOffset,
+													&gOffset, &bOffset
+												);
+	gpu::ConvolutionFilters<T> convolutionFilters;
+  
+  convolutionFilters.applyConvolution(inputBuffer, outputBuffer,
+																			kernel,width,height, kernelSize, 
+																			normal, rOffset, 0);
+  
+	/*convolutionFilters.applyConvolution(inputBuffer, outputBuffer,
+  																		kernel,width,height, kernelSize, 
+  																		normal, gOffset, 1);
+
+
+	convolutionFilters.applyConvolution(inputBuffer, outputBuffer,
+  																		kernel,width,height, kernelSize, 
+																			normal, bOffset, 2);             								
+ */
+	 __syncthreads();
+}
+
+
+
+
+template <typename T>
 void callKernel(void(*kernel)(T*,T*,int,int,int,int,float,gpu::FilterType), 
                 int blocks, int threads, 
           			T* inputBuffer,T* outputBuffer,
@@ -110,6 +142,20 @@ void callKernel(void(*kernel)(T*,T*,int,int,int,int,float,gpu::FilterType),
   kernel<<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer, 
 															 width, height, channels, offset, 
 															 value,filterType);
+}
+
+template <typename T>
+void callConvolutionKernel(void(*kernel)(T*,T*,int*,int,int,int,int,int),
+			                		 int blocks, int threads, 
+      			    					 T* inputBuffer,T* outputBuffer,int* convKernel,
+													 int width, int height, int kernelSize, int normal,
+													 int offset) 
+{
+  dim3 dimGrid(blocks,1,1);
+  dim3 dimBlock(threads,1,1);
+  kernel<<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer,convKernel, 
+															 width, height, kernelSize, normal,
+															 offset); 
 }
 
 template <typename T>
@@ -159,28 +205,33 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,
   
 	timeval tim;
   double dTime1 = gpu::getTime(tim);
-	callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
+	/*callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
                             d_data,d_result,width,height,channels,offset,
 														BRIGHTNESS_VALUE, gpu::LUMINOUS_FILTER_BRIGHTNESS);
-  
+  */
   double dTime2 = gpu::getTime(tim);
   std::cout << "time taken for brightness on GPU: " << dTime2 - dTime1 << std::endl;
-	callKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
+	/*callKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
                             d_result,d_result,width,height,channels,offset,
                             SATURATION_VALUE,gpu::COLORSPACE_FILTER_SATURATION);
   
-	
+	*/
   double dTime3 = gpu::getTime(tim);
   std::cout << "time taken for saturation on GPU: " << dTime3 - dTime2 << std::endl;
-	callBlendKernel<unsigned char>(blendFilterKernel,setup.blocks,setup.threads,
+	/*callBlendKernel<unsigned char>(blendFilterKernel,setup.blocks,setup.threads,
                             d_data,d_result,d_result,width,height,channels,
 														offset,SATURATION_VALUE,
 														gpu::BLEND_FILTER_LINEARLIGHT);
-  
+  */
 
+  int convKernel[]={-1,0,1,-2,0,2,-1,0,1};
+	int kernelSize = sizeof(convKernel)/sizeof(*convKernel);
+	callConvolutionKernel(convolutionFilterKernel,setup.blocks,setup.threads,d_data,d_result,
+												convKernel,width,height,channels,kernelSize,offset);
+	
+	cudaMemcpy(h_result,d_result,sizeResult,cudaMemcpyDeviceToHost);
   double dTime4 = gpu::getTime(tim);
-  std::cout << "time taken for blend on GPU: " << dTime4 - dTime3 << std::endl;
-  cudaMemcpy(h_result,d_result,sizeResult,cudaMemcpyDeviceToHost);
+  std::cout << "time taken for convolution on GPU: " << dTime4 - dTime3 << std::endl;
   
   cudaFree(d_data);
   cudaFree(d_result);

@@ -43,7 +43,7 @@ namespace gpu
   	setup->blocks = blocks;
 	}
 
-	static void printMetaData(const gpu::Image& image)
+	static void printMetaData(const Image& image)
 	{
   	std::cout << "Image Metadata:" << std::endl;
   	std::cout << "width: " << image.width << ", height: " << image.height << 

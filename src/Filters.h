@@ -27,34 +27,34 @@ namespace gpu
   {
     LUMINOUS_FILTER_CONTRAST, 
     LUMINOUS_FILTER_BRIGHTNESS,
-		COLORSPACE_FILTER_SATURATION,
+    COLORSPACE_FILTER_SATURATION,
     COLORSPACE_FILTER_SEPIA,
   };
   
   enum BlendType
  	{
 		BLEND_FILTER_NORMAL,
-    BLEND_FILTER_LIGHTEN,
-    BLEND_FILTER_DARKEN,
-    BLEND_FILTER_MULTIPLY,
-    BLEND_FILTER_AVERAGE,
-    BLEND_FILTER_ADD,
-    BLEND_FILTER_SUBTRACT,
-    BLEND_FILTER_DIFFERENCE,
-    BLEND_FILTER_NEGATION,
-    BLEND_FILTER_SCREEN,
-    BLEND_FILTER_EXCLUSION,
-    BLEND_FILTER_OVERLAY,
-    BLEND_FILTER_SOFTLIGHT,
-    BLEND_FILTER_HARDLIGHT,
-    BLEND_FILTER_COLORDODGE,
-    BLEND_FILTER_COLORBURN,
-    BLEND_FILTER_LINEARDODGE,
-    BLEND_FILTER_LINEARBURN,
-    BLEND_FILTER_LINEARLIGHT,
-    BLEND_FILTER_VIVIDLIGHT,
-    BLEND_FILTER_PINLIGHT,
-    BLEND_FILTER_HARDMIX
+        BLEND_FILTER_LIGHTEN,
+        BLEND_FILTER_DARKEN,
+        BLEND_FILTER_MULTIPLY,
+        BLEND_FILTER_AVERAGE,
+        BLEND_FILTER_ADD,
+        BLEND_FILTER_SUBTRACT,
+        BLEND_FILTER_DIFFERENCE,
+        BLEND_FILTER_NEGATION,
+        BLEND_FILTER_SCREEN,
+        BLEND_FILTER_EXCLUSION,
+        BLEND_FILTER_OVERLAY,
+        BLEND_FILTER_SOFTLIGHT,
+        BLEND_FILTER_HARDLIGHT,
+        BLEND_FILTER_COLORDODGE,
+        BLEND_FILTER_COLORBURN,
+        BLEND_FILTER_LINEARDODGE,
+        BLEND_FILTER_LINEARBURN,
+        BLEND_FILTER_LINEARLIGHT,
+        BLEND_FILTER_VIVIDLIGHT,
+        BLEND_FILTER_PINLIGHT,
+        BLEND_FILTER_HARDMIX
 	 };
  
   template<typename T>
@@ -684,7 +684,53 @@ namespace gpu
             
       }
 	}
-  // Blend Filters End.  
+
+
+    template<typename T>
+    class ConvolutionFilters
+    {
+    public:
+        FUNCTION_PREFIX void applyConvolution(T& inputBuffer, 
+                                              T& outputBuffer,
+                                              T& kernel,
+                                              int imageHeight,
+                                              int imageWidth,
+                                              int kernelSize,
+                                              int normal,
+                                              int offset,
+                                              int channel);
+    };
+
+    template<typename T>
+    FUNCTION_PREFIX void ConvolutionFilters<T>::applyConvolution(T& inputBuffer, 
+                                                                 T& outputBuffer,
+                                                                 T& kernel,
+                                                                 int imageHeight,
+                                                                 int imageWidth,
+                                                                 int kernelSize,
+                                                                 int normal,
+                                                                 int offset,
+                                                                 int channel)
+    {
+        int startingOffset=offset-imageWidth*kernelSize/2-kernelSize/2;
+        int boundaryBase =channel*imageWidth*imageHeight;
+        int boundaryLimit=channel*imageWidth*imageHeight+imageWidth*imageHeight;
+        
+        int sum;
+        int _offset=startingOffset-1;
+        for (int c=1;c<=kernelSize*kernelSize;c++)
+        {
+            if(c%kernelSize==0)_offset+=imageWidth-kernelSize;
+            else _offset+=1;
+            if (_offset>boundaryBase && _offset<boundaryLimit)
+            {
+                sum+=inputBuffer[_offset];
+            }
+        }
+        sum=sum/normal;
+        outputBuffer[offset]=sum;
+    
+    }
 }
 
 #endif //gpu_FilterTemplates_h

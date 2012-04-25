@@ -54,7 +54,8 @@ namespace gpu
   private:
 		LuminousFilters<T> luminousFilter;
 		ColorSpaceFilters<T> colorSpaceFilter;
-    BlendFilters<T> blendFilter;
+        BlendFilters<T> blendFilter;
+        ConvolutionFilters<T>convolutionFilter;
   public:
     
     void applyLuminousFilter    (T *inputBuffer,
@@ -82,6 +83,15 @@ namespace gpu
                                  int spectrum,
                                  float value,
                                  gpu::BlendType blendType);
+      
+    void applyConvolution(T *inputBuffer, 
+                          T *outputBuffer, 
+                          int *kernel, 
+                          int imageWidth,
+                          int imageHeight, 
+                          int spectrum,
+                          int kernelSize,
+                          int normal);
   };
 
   template<typename T>
@@ -156,4 +166,31 @@ namespace gpu
             }
         //}
     }
+    
+    template<typename T>
+    void ImageProcessing<T>::applyConvolution(T *inputBuffer, 
+                                              T *outputBuffer, 
+                                              int *kernel, 
+                                              int imageWidth,
+                                              int imageHeight, 
+                                              int spectrum,
+                                              int kernelSize,
+                                              int normal)                                   
+    {
+        
+        
+        for(int channel = 0; channel < spectrum ; ++channel)
+        {
+        for(int j = 0; j < imageWidth; ++j)
+        {
+            for(int i = 0; i < imageHeight; ++i)
+            {
+            int offset = channel*imageWidth*imageHeight +  i * imageWidth + j;
+            convolutionFilter.applyConvolution(inputBuffer,outputBuffer,kernel,imageWidth,imageHeight,kernelSize,normal,offset,channel);
+            }
+        }
+        //}
+    }
+    
+    
 }

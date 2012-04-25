@@ -717,6 +717,7 @@ namespace gpu
         int boundaryLimit =channel*imageWidth*imageHeight+imageWidth*imageHeight;
         
         int sum=0;
+        int count=0;
         int _offset=startingOffset-1;
         for (int c=1;c<=kernelSize*kernelSize;c++)
         {
@@ -724,10 +725,12 @@ namespace gpu
             else _offset+=1;
             if (_offset>boundaryBase && _offset<boundaryLimit)
             {
-              sum+=inputBuffer[_offset]*kernel[c-1];
+             sum+=inputBuffer[_offset]*kernel[c-1];
+             count+=kernel[c-1];
             }
         }
-        sum=sum/normal;
+        if (count==0)count=1;
+        sum=sum/count;
         PIXEL_DOMAIN_CHECK(sum);
         outputBuffer[offset]=sum;
     

@@ -3,6 +3,8 @@
 #include <ctime>
 #include <vector>
 #include <stdio.h>
+#include <cmath>
+
 #include "CImg.h"
 
 #include "cpuProcessImage.h"
@@ -54,8 +56,7 @@ __global__ void colorspaceFilterKernel(T* inputBuffer, T* outputBuffer,
  	int rOffset, gOffset, bOffset;
   
   calculateChannelOffsets(offset,blockIdx.x,blockDim.x,threadIdx.x,
-                          &rOffset, &gOffset, 
-													&bOffset);
+                          &rOffset, &gOffset,&bOffset);
   
 	gpu::ColorSpaceFilters<T> colorSpaceFilters;
   
@@ -79,9 +80,7 @@ __global__ void blendFilterKernel(T* baseBuffer, T* blendBuffer,
  	int rOffset, gOffset, bOffset;
   
   calculateChannelOffsets(offset,blockIdx.x,blockDim.x,threadIdx.x,
-                          &rOffset,
-													&gOffset,
-													&bOffset);
+                          &rOffset,&gOffset,&bOffset);
   
 	gpu::BlendFilters<T> blendFilters;
   
@@ -106,25 +105,22 @@ __global__ void convolutionFilterKernel(T* inputBuffer, T* outputBuffer,
 {
 	int rOffset, gOffset, bOffset;
 	calculateChannelOffsets(offset, blockIdx.x, blockDim.x, threadIdx.x,
-													&rOffset,
-													&gOffset, &bOffset
-												);
+													&rOffset,&gOffset,&bOffset);
+	
 	gpu::ConvolutionFilters<T> convolutionFilters;
   
-  convolutionFilters.applyConvolution(inputBuffer, outputBuffer,
-																			kernel,width,height, kernelSize, 
-																			normal, rOffset, 0);
+  convolutionFilters.applyConvolution(inputBuffer,outputBuffer,
+																			kernel,width,height,kernelSize, 
+																			normal,rOffset,0);
   
-	/*convolutionFilters.applyConvolution(inputBuffer, outputBuffer,
+	convolutionFilters.applyConvolution(inputBuffer, outputBuffer,
   																		kernel,width,height, kernelSize, 
   																		normal, gOffset, 1);
-
 
 	convolutionFilters.applyConvolution(inputBuffer, outputBuffer,
   																		kernel,width,height, kernelSize, 
 																			normal, bOffset, 2);             								
- */
-	 __syncthreads();
+	__syncthreads();
 }
 
 
@@ -145,7 +141,8 @@ void callKernel(void(*kernel)(T*,T*,int,int,int,int,float,gpu::FilterType),
 }
 
 template <typename T>
-void callConvolutionKernel(void(*kernel)(T*,T*,int*,int,int,int,int,int),
+void callConvolutionKernel(void(*kernel)(T*,T*,int*,
+																				int,int,int,int,int),
 			                		 int blocks, int threads, 
       			    					 T* inputBuffer,T* outputBuffer,int* convKernel,
 													 int width, int height, int kernelSize, int normal,
@@ -205,17 +202,17 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,
   
 	timeval tim;
   double dTime1 = gpu::getTime(tim);
-	/*callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
+	callKernel<unsigned char>(luminousFilterKernel,setup.blocks,setup.threads,
                             d_data,d_result,width,height,channels,offset,
 														BRIGHTNESS_VALUE, gpu::LUMINOUS_FILTER_BRIGHTNESS);
-  */
+  
   double dTime2 = gpu::getTime(tim);
   std::cout << "time taken for brightness on GPU: " << dTime2 - dTime1 << std::endl;
-	/*callKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
+	callKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
                             d_result,d_result,width,height,channels,offset,
                             SATURATION_VALUE,gpu::COLORSPACE_FILTER_SATURATION);
   
-	*/
+	
   double dTime3 = gpu::getTime(tim);
   std::cout << "time taken for saturation on GPU: " << dTime3 - dTime2 << std::endl;
 	/*callBlendKernel<unsigned char>(blendFilterKernel,setup.blocks,setup.threads,
@@ -224,15 +221,24 @@ void runKernel(unsigned char* h_data, unsigned char* h_result,
 														gpu::BLEND_FILTER_LINEARLIGHT);
   */
 
-  int convKernel[]={-1,0,1,-2,0,2,-1,0,1};
-	int kernelSize = sizeof(convKernel)/sizeof(*convKernel);
-	callConvolutionKernel(convolutionFilterKernel,setup.blocks,setup.threads,d_data,d_result,
-												convKernel,width,height,channels,kernelSize,offset);
+  //int h_kernel[]={-1,0,1,-2,0,2,-1,0,1};
+	//int h_kernel[] = {2,4,5,4,2,4,9,12,9,4,5,12,15,12,5,4,9,12,9,4,2,4,5,4,2};
+	int h_kernel[] = {-2,-1,0,-1,1,1,0,1,2};
+	int kernelSize = sizeof(h_kernel)/sizeof(*h_kernel);
+	int kernelWidth = static_cast<int>(sqrt(kernelSize));
+	int dataSizeKernel = kernelSize * sizeof(int);
+	int* d_kernel = 0;
+	cudaMalloc((void**)&d_kernel,dataSizeKernel);
+	cudaMemcpy(d_kernel, h_kernel, dataSizeKernel, cudaMemcpyHostToDevice);
+	/*callConvolutionKernel(convolutionFilterKernel,setup.blocks,setup.threads,
+												d_data,d_result,d_kernel,
+												width,height,kernelWidth,1,offset);
 	
-	cudaMemcpy(h_result,d_result,sizeResult,cudaMemcpyDeviceToHost);
   double dTime4 = gpu::getTime(tim);
   std::cout << "time taken for convolution on GPU: " << dTime4 - dTime3 << std::endl;
-  
+	*/
+	cudaMemcpy(h_result,d_result,sizeResult,cudaMemcpyDeviceToHost);
+ 	cudaFree(d_kernel); 
   cudaFree(d_data);
   cudaFree(d_result);
 }

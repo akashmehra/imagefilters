@@ -1,3 +1,6 @@
+#ifndef gpu_cpuProcessingImage_h
+#define gpu_cpuProcessingImage_h
+
 #include <ctime>
 #include <string>
 #include <vector>
@@ -181,16 +184,16 @@ namespace gpu
         
         for(int channel = 0; channel < spectrum ; ++channel)
         {
-        for(int j = 0; j < imageWidth; ++j)
-        {
+        	for(int j = 0; j < imageWidth; ++j)
+        	{
             for(int i = 0; i < imageHeight; ++i)
             {
             int offset = channel*imageWidth*imageHeight +  i * imageWidth + j;
             convolutionFilter.applyConvolution(inputBuffer,outputBuffer,kernel,imageWidth,imageHeight,kernelSize,normal,offset,channel);
             }
-        }
-        //}
-    }
-    
-    
+        	}
+    		}
+		}
 }
+
+#endif

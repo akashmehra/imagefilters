@@ -10,12 +10,6 @@
 
 using namespace cimg_library;
 
-/*void printMetaData(const gpu::Image& image)
-{
-  std::cout << "Image Metadata:" << std::endl;
-  std::cout << "width: " << image.width << ", height: " << image.height << 
-  ", size: " << image.size << ", spectrum: " << image.spectrum << std::endl;
-}*/
 
 int main(int argc, char* argv[])
 {
@@ -51,13 +45,13 @@ int main(int argc, char* argv[])
    
       //imp.applyLuminousFilter(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, BRIGHTNESS_VALUE,gpu::LUMINOUS_FILTER_BRIGHTNESS); 
     imp.applyColorSpaceFilter(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, S_VALUE,gpu::COLORSPACE_FILTER_SATURATION); 
-    int convKernel[]={1,1,1,1,1,1,1,1,1};
-    imp.applyConvolution(inputBuffer,outputBuffer,&convKernel, imgInfo.width, imgInfo.height, imgInfo.spectrum,3,9);
+    int convKernel[]={-1,0,1,-2,0,2,-1,0,1};
+    imp.applyConvolution(inputBuffer,outputBuffer,convKernel, imgInfo.width, imgInfo.height, imgInfo.spectrum,3,1);
     
 		double dTime2 = gpu::getTime(tim);
     std::cout << "time taken for saturation: " << dTime2 - dTime1 << std::endl;
     
-      imp.applyBlendFilter(inputBuffer,inputBuffer,outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, 1.0,gpu::BLEND_FILTER_LINEARLIGHT); 
+      //imp.applyBlendFilter(inputBuffer,inputBuffer,outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, 1.0,gpu::BLEND_FILTER_LINEARLIGHT); 
 
     CImg<unsigned char> outputImage(outputBuffer,imgInfo.width,imgInfo.height,1,
                                     imgInfo.spectrum,0);
@@ -81,4 +75,4 @@ int main(int argc, char* argv[])
   }
 }
 
-}
+

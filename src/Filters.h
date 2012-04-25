@@ -690,9 +690,9 @@ namespace gpu
     class ConvolutionFilters
     {
     public:
-        FUNCTION_PREFIX void applyConvolution(T& inputBuffer, 
-                                              T& outputBuffer,
-                                              T& kernel,
+        FUNCTION_PREFIX void applyConvolution(T* inputBuffer, 
+                                              T* outputBuffer,
+                                              int* kernel,
                                               int imageHeight,
                                               int imageWidth,
                                               int kernelSize,
@@ -702,32 +702,33 @@ namespace gpu
     };
 
     template<typename T>
-    FUNCTION_PREFIX void ConvolutionFilters<T>::applyConvolution(T& inputBuffer, 
-                                                                 T& outputBuffer,
-                                                                 T& kernel,
-                                                                 int imageHeight,
+    FUNCTION_PREFIX void ConvolutionFilters<T>::applyConvolution(T* inputBuffer, 
+                                                                 T* outputBuffer,
+                                                                 int* kernel,
                                                                  int imageWidth,
+                                                                 int imageHeight,
                                                                  int kernelSize,
                                                                  int normal,
                                                                  int offset,
                                                                  int channel)
     {
-        int startingOffset=offset-imageWidth*kernelSize/2-kernelSize/2;
-        int boundaryBase =channel*imageWidth*imageHeight;
-        int boundaryLimit=channel*imageWidth*imageHeight+imageWidth*imageHeight;
+      int startingOffset=offset-(imageWidth*(kernelSize/2))-kernelSize/2;
+        int boundaryBase  =channel*imageWidth*imageHeight;
+        int boundaryLimit =channel*imageWidth*imageHeight+imageWidth*imageHeight;
         
-        int sum;
+        int sum=0;
         int _offset=startingOffset-1;
         for (int c=1;c<=kernelSize*kernelSize;c++)
         {
-            if(c%kernelSize==0)_offset+=imageWidth-kernelSize;
+            if(c%kernelSize==0) _offset+=(imageWidth-kernelSize);
             else _offset+=1;
             if (_offset>boundaryBase && _offset<boundaryLimit)
             {
-                sum+=inputBuffer[_offset];
+              sum+=inputBuffer[_offset]*kernel[c-1];
             }
         }
         sum=sum/normal;
+        PIXEL_DOMAIN_CHECK(sum);
         outputBuffer[offset]=sum;
     
     }

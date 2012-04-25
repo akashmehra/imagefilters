@@ -9,8 +9,46 @@
 #ifndef gpu_Utils_h
 #define gpu_Utils_h
 
+#include <iostream>
+#include "Constants.h"
+#include "CImg.h"
+ 
 namespace gpu 
 {
+	template <typename T>
+	static void unrollMatrix(cimg_library::CImg<T>& image, unsigned int width, unsigned int height,
+  	                  unsigned int spectrum, T* buffer)
+	{
+  	{
+    	for(unsigned int k = 0;k<spectrum;++k)
+    	{	
+      	for(unsigned int j=0;j<height;++j)
+      	{
+        	for(int i=0;i<width;++i)
+        	{
+          	buffer[k*height*width+j*width+i] = image(i,j,0,k);
+        	}
+      	}
+    	}
+  	}
+                                                                             
+	}	
+
+	struct Image
+	{
+  	unsigned int width;
+ 		unsigned int height;
+  	unsigned int size;
+  	unsigned int spectrum;
+  
+  	Image(unsigned int width_,unsigned int height,
+    	    unsigned int size_,unsigned int spectrum_)
+  	:width(width_),
+  	height(height),
+  	size(size_),
+  	spectrum(spectrum_)
+  	{}
+	};
 
 	struct Setup
 	{

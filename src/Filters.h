@@ -10,6 +10,7 @@
 #define gpu_FilterTemplates_h
 
 #include "Constants.h"
+#include "Utils.h"
 
 #ifdef GCC_COMPILATION
 	#define FUNCTION_PREFIX 

@@ -13,6 +13,8 @@ __device__ void calculateChannelOffsets(int offset, int blockIndex,
 	*bOffset = *rOffset + 2*offset;
 }
 
+
+
 void sendWarmUpSignal(unsigned char* h_data, const unsigned int sizeData)
 {
   unsigned char* d_data;

@@ -10,6 +10,9 @@
 #define gpu_Constants_h
 
 #include <cmath>
+#include <string>
+
+
 #define BUFFER_SIZE 256
 #define MILLION 1000000
 #define THOUSAND 1000
@@ -23,6 +26,14 @@
 #define CONTRAST_VALUE 1.5f
 #define SATURATION_VALUE 50.2f
 #define PIXEL_DOMAIN_CHECK(T){if(T>255)T=255;else if (T<0)T=0;}
+
+
+
+
+static const std::string JPG_EXTENSION = ".jpg";
+static const std::string JPEG_EXTENSION = ".jpeg";
+
+
 
 /**
  		* Blend filters are particularly useful in combining

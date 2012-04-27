@@ -12,9 +12,32 @@
 #include <iostream>
 #include "Constants.h"
 #include "CImg.h"
- 
+#include <vector>
+#include <string>
+#include <dirent.h>
+#include <sys/types.h>
+#include <cerrno> 
 namespace gpu 
 {
+
+	static void readDirectory(std::string directoryPath,
+								 						std::vector<std::string>* fileList)
+	{
+		DIR* dir;
+		struct dirent* dirp;
+		if((dir = opendir(directoryPath.c_str())) == NULL)
+		{
+			std::cout << "Error Opening directory, error: " << errno << std::endl;
+		}
+
+		while((dirp = readdir(dir)) != NULL)
+		{
+			fileList->push_back(std::string(dirp->d_name));
+		}
+		closedir(dir);
+	}
+
+
 	template <typename T>
 	static void unrollMatrix(cimg_library::CImg<T>& image, unsigned int width, unsigned int height,
   	                  unsigned int spectrum, T* buffer)

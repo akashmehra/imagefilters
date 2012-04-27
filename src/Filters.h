@@ -719,15 +719,17 @@ namespace gpu
         int sum=0;
         int count=0;
         int _offset=startingOffset-1;
+        int calc=1;
         for (int c=1;c<=kernelSize*kernelSize;c++)
         {
-            if(c%kernelSize==0) _offset+=(imageWidth-kernelSize);
+            if(calc==kernelSize) {_offset+=(imageWidth-kernelSize); calc=1;}
             else _offset+=1;
             if (_offset>boundaryBase && _offset<boundaryLimit)
             {
              sum+=inputBuffer[_offset]*kernel[c-1];
              count+=kernel[c-1];
             }
+            calc+=1;
         }
         if (count==0)count=1;
         sum=sum/count;

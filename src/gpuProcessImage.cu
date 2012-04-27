@@ -71,11 +71,11 @@ void runLuminousKernel(const gpu::Setup& setup,unsigned char* d_data, unsigned c
 
 void runConvolutionKernel(const gpu::Setup& setup, unsigned char* d_data, unsigned char* d_result,
 													unsigned char* h_result,
-													int width, int height, int channels)
+													int width, int height, int channels, int offset)
 {
 
 	//int h_kernel[] = {-2,-1,0,-1,1,1,0,1,2};
-	int h_kernel[] = {-1,-1,1,1,-1,-1,1,1,1};
+	int h_kernel[] = {-1,-1,-1,-1,8,-1,-1,-1,-1};
 	int kernelSize = sizeof(h_kernel)/sizeof(*h_kernel);
 	int kernelWidth = static_cast<int>(sqrt(kernelSize));
 	int dataSizeKernel = kernelSize * sizeof(int);

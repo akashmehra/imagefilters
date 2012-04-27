@@ -60,18 +60,18 @@ int main(int argc, char* argv[])
     		gpu::ImageProcessing<unsigned char> imp;
     		timeval tim;
     
-    		double dTime1 = gpu::getTime(tim);
     
     		gpu::unrollMatrix(image,imgInfo.width,imgInfo.height,imgInfo.spectrum,
                 inputBuffer);
    
+      	int convKernel[]={-1,-1,-1,-1,8,-1,-1,-1,-1};
+    		double dTime1 = gpu::getTime(tim);
       	//imp.applyLuminousFilter(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, BRIGHTNESS_VALUE,gpu::LUMINOUS_FILTER_BRIGHTNESS); 
     		//imp.applyColorSpaceFilter(inputBuffer, outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, S_VALUE,gpu::COLORSPACE_FILTER_SATURATION); 
-      	//int convKernel[]={3,3,3,3,3,3,3,3,3};
 				imp.applyConvolution(inputBuffer,outputBuffer,convKernel, imgInfo.width, imgInfo.height, imgInfo.spectrum,3,1);
     
-				//double dTime2 = gpu::getTime(tim);
-    		//std::cout << "time taken for convolution: " << dTime2 - dTime1 << std::endl;
+				double dTime2 = gpu::getTime(tim);
+    		std::cout << "time taken for convolution: " << dTime2 - dTime1 << std::endl;
     
       	//imp.applyBlendFilter(inputBuffer,inputBuffer,outputBuffer, imgInfo.width, imgInfo.height, imgInfo.spectrum, 1.0,gpu::BLEND_FILTER_LINEARLIGHT); 
 

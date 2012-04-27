@@ -68,6 +68,31 @@ void runLuminousKernel(const gpu::Setup& setup,unsigned char* d_data, unsigned c
 
 }
 
+
+void runConvolutionKernel(const gpu::Setup& setup, unsigned char* d_data, unsigned char* d_result,
+													unsigned char* h_result,
+													int width, int height, int channels)
+{
+
+	//int h_kernel[] = {-2,-1,0,-1,1,1,0,1,2};
+	int h_kernel[] = {-1,-1,1,1,-1,-1,1,1,1};
+	int kernelSize = sizeof(h_kernel)/sizeof(*h_kernel);
+	int kernelWidth = static_cast<int>(sqrt(kernelSize));
+	int dataSizeKernel = kernelSize * sizeof(int);
+	int* d_kernel = 0;
+	timeval tim;
+	double dTime1 = gpu::getTime(tim);
+	cudaMalloc((void**)&d_kernel,dataSizeKernel);
+	cudaMemcpy(d_kernel, h_kernel, dataSizeKernel, cudaMemcpyHostToDevice);
+	callConvolutionKernel<unsigned char>(convolutionFilterKernel,setup.blocks,setup.threads,
+																			 d_data,d_result,d_kernel,
+																			 width,height,kernelWidth,1,offset);
+	
+  double dTime2 = gpu::getTime(tim);
+  std::cout << "time taken for convolution on GPU: " << dTime2 - dTime1 << std::endl;
+	cudaFree(d_kernel);
+}
+
 void process(unsigned char* h_data, unsigned char* h_result,
 						int width, int height, int channels)
 {
@@ -88,7 +113,8 @@ void process(unsigned char* h_data, unsigned char* h_result,
   int offset = width*height;
   
  
- 	runLuminousKernel(setup,d_data,d_result,h_result,width,height,channels,offset);
+ 	//runLuminousKernel(setup,d_data,d_result,h_result,width,height,channels,offset);
+ 	runConvolutionKernel(setup,d_data,d_result,h_result,width,height,channels,offset);
  
 	/*callKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
                             d_result,d_result,width,height,channels,offset,
@@ -105,20 +131,7 @@ void process(unsigned char* h_data, unsigned char* h_result,
 
   //int h_kernel[]={-1,0,1,-2,0,2,-1,0,1};
 	//int h_kernel[] = {2,4,5,4,2,4,9,12,9,4,5,12,15,12,5,4,9,12,9,4,2,4,5,4,2};
-	/*int h_kernel[] = {-2,-1,0,-1,1,1,0,1,2};
-	int kernelSize = sizeof(h_kernel)/sizeof(*h_kernel);
-	int kernelWidth = static_cast<int>(sqrt(kernelSize));
-	int dataSizeKernel = kernelSize * sizeof(int);
-	int* d_kernel = 0;
-	cudaMalloc((void**)&d_kernel,dataSizeKernel);
-	cudaMemcpy(d_kernel, h_kernel, dataSizeKernel, cudaMemcpyHostToDevice);
-	callConvolutionKernel(convolutionFilterKernel,setup.blocks,setup.threads,
-												d_data,d_result,d_kernel,
-												width,height,kernelWidth,1,offset);
-	
-  double dTime4 = gpu::getTime(tim);
-  std::cout << "time taken for convolution on GPU: " << dTime4 - dTime3 << std::endl;
-	*/
+
 	cudaMemcpy(h_result,d_result,sizeResult,cudaMemcpyDeviceToHost);
  	//cudaFree(d_kernel); 
   cudaFree(d_data);

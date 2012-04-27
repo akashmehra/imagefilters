@@ -25,20 +25,20 @@ int main(int argc, char* argv[])
   		std::vector<std::string>::iterator it = fileList.begin();
      	int count = 0;
   		
-			int warmpupBuffer = calloc(1000, sizeof(float));
+			int* warmupBuffer =(int*) calloc(1000, sizeof(int));
 
       timeval tim;
       double dTime1 = gpu::getTime(tim);
 					
 			std::cout << "Sending warm up signal to GPU." << std::endl;
    	 	
-			sendWarmUpSignal(warmupBuffer,1000*sizeof(float)); 
+			sendWarmUpSignal(warmupBuffer,1000*sizeof(int)); 
 
 			double dTime2 = gpu::getTime(tim);
-			double warmpupTime = dTime2 - dTime1;
+			double warmupTime = dTime2 - dTime1;
     	std::cout << "time taken for performing warm up: " << warmupTime << std::endl;
 			
-   	 	delete[] warmpupBuffer;
+   	 	delete[] warmupBuffer;
 			
 			std::cout << "Starting File I/O using CPU." << std::endl;
 			double fileIOTime = 0.0;
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
   			{
   				std::string filename = imageFilename.substr(0,imageFilename.length()-4);	
      			int indexOfSlash = imageFilename.find_last_of("/");
-  				
+  				std::cout << "filename: " << filename << std::endl;
 					std::cout << "Reading Image from Disk." << std::endl;
 					dTime1 = gpu::getTime(tim);
 	
@@ -71,6 +71,9 @@ int main(int argc, char* argv[])
 					CImg<unsigned char> image(imageFilename.c_str());
   
 					std::cout << "Unrolling Image and setting up blocks and threads." << std::endl;
+					int width = image.width();
+					int height = image.height();
+					int channels = image.spectrum();
 					gpu::Image imgInfo(image.width(),image.height(),image.width()*image.height(),image.spectrum());
       		
 					/*
@@ -81,11 +84,11 @@ int main(int argc, char* argv[])
        			4. Perform the operation.
        		*/
       
-      		unsigned char* inputBuffer = new unsigned char[imgInfo.spectrum*imgInfo.size];
-      		unsigned char* outputBuffer = new unsigned char[imgInfo.spectrum*imgInfo.size];
+      		unsigned char* h_data = new unsigned char[imgInfo.spectrum*imgInfo.size];
+      		unsigned char* h_result = new unsigned char[imgInfo.spectrum*imgInfo.size];
       
       		gpu::unrollMatrix(image,imgInfo.width,imgInfo.height,imgInfo.spectrum,
-                  inputBuffer);
+                  h_data);
     			
     			
 
@@ -115,7 +118,7 @@ int main(int argc, char* argv[])
 					dTime1 = gpu::getTime(tim);
 					std::cout << "Begining execution on GPU." << std::endl;
           int offset = width*height;
-          switch(filterFlag)
+          switch(options.filterFlag)
 					{									
 
 						/*
@@ -131,12 +134,18 @@ int main(int argc, char* argv[])
 						*/
 
 
-						case CONVOLUTION:
-							cudaMalloc((void**)&d_kernel,sizeKernel);
-							cudaMemcpy(d_kernel,h_kernel,sizeKernel,cudaMemcpyHostToDevice);
-							runConvolutionKernel(setup,d_data,d_result,h_result,d_kernel
-																width,height,channels,offset);
-          		cudaFree(d_kernel); 
+						case gpu::CONVOLUTION:
+							std::cout << "Applying Convolution Filter..." << std::endl;
+							int h_kernel[] = {-1,-1,-1,-1,9,-1,-1,-1,-1};
+							int sizeKernel = sizeof(h_kernel)/sizeof(*h_kernel);
+							int windowSize = static_cast<int>(sqrt(sizeKernel));
+							int* d_kernel;
+							cudaMalloc((void**)&d_kernel,windowSize);
+							cudaMemcpy(d_kernel,h_kernel,windowSize,cudaMemcpyHostToDevice);
+							runConvolutionKernel(setup,d_data,d_result,h_result,
+																	 d_kernel,windowSize,
+																	 width,height,channels,offset);
+          		cudaFree(d_kernel);
               break;
 						/*
 						case BLEND:
@@ -172,7 +181,7 @@ int main(int argc, char* argv[])
 					
 
 
-    			CImg<unsigned char> outputImage(outputBuffer,imgInfo.width,imgInfo.height,1,
+    			CImg<unsigned char> outputImage(h_result,imgInfo.width,imgInfo.height,1,
                                     imgInfo.spectrum,0);
     
 					dTime1 = dTime2;
@@ -196,17 +205,18 @@ int main(int argc, char* argv[])
           	}
           }
 					
-    			delete[] inputBuffer;
-    			delete[] outputBuffer;
+    			delete[] h_data;
+    			delete[] h_result;
 			}
-			std::cout << "File I/O time: " << fileIOTime << std::endl;
-			std::cout << "Configuration time: " << configurationTime << std::endl;
-			std::cout << "Execution time: " << executionTime << std::endl;
-			std::cout << "GPU Utilization: " << (double)executionTime/(fileIOTime+configurationTime+executionTime) << std::endl;
 		}
+		
+		std::cout << "File I/O time: " << fileIOTime << std::endl;
+		std::cout << "Configuration time: " << configurationTime << std::endl;
+		std::cout << "Execution time: " << executionTime << std::endl;
+		std::cout << "GPU Utilization: " << (double)executionTime/(fileIOTime+configurationTime+executionTime) << std::endl;
   }
   else
   {
-    std::cout << "Usage: " << argv[0] << " <image-filename> <output-filename>" << std::endl;
+    std::cout << "Usage: " << argv[0] << " -filter [optional] <image-directory>" << std::endl;
   }
 }

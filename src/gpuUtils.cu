@@ -15,9 +15,9 @@ __device__ void calculateChannelOffsets(int offset, int blockIndex,
 
 
 
-void sendWarmUpSignal(unsigned char* h_data, const unsigned int sizeData)
+void sendWarmUpSignal(int* h_data, const unsigned int sizeData)
 {
-  unsigned char* d_data;
+  int* d_data;
   cudaMalloc((void**)&d_data,sizeData);
   cudaMemcpy(d_data,h_data,sizeData,cudaMemcpyHostToDevice);
   cudaFree(d_data);

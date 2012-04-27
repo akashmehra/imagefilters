@@ -126,59 +126,59 @@ namespace gpu
 			}
 
 			Options(){}
-			~Options(){delete[] convolutionKernel;}
+			~Options(){}//delete[] convolutionKernel;}
 	};
 
 
 	static bool parseCommandLine(int argc, char* argv[], Options* options)
 	{
-		bool validArguments = true;
-		for(int i = 1; i < argc; ++i)
+		bool validArguments = false;
+    std::cout << argv[1] << std::endl;
+		std::string str(argv[1]);
+		if(str  == "-filter")
 		{
-			if(argv[1] != "-filter")
-			{
-				validArguments = false;
-				break;
-			}
-			else
-			{
-				std::stringstream ss;
-			 	ss	<< std::string(argv[2]);
-				int value;
-				ss >> value;
-				options->filterFlag = (FilterFlag)value;
-				if(options->filterFlag == BRIGHTNESS
+			std::stringstream ss;
+			ss	<< std::string(argv[2]);
+			int value;
+			ss >> value;
+			options->filterFlag = (FilterFlag)value;
+			std::cout << "value: " << value << std::endl;
+			if(options->filterFlag == BRIGHTNESS
 					||options->filterFlag == SEPIA
 					|| options->filterFlag == CONTRAST
 					|| options->filterFlag == SATURATION)
-				{
-					options->directoryPath = std::string(argv[3]);
-				}
-				else if(options->filterFlag == BLEND)
-				{
-					std::stringstream ss;
-				 	ss	<< std::string(argv[3]);
-					int blendValue;
-					ss >> blendValue;
-					options->blendMode = (BlendType)blendValue;
-				 	options->directoryPath = argv[4];	
-				}
-				else if(options->filterFlag == CONVOLUTION)
-				{
-					std::stringstream ss;
-				 	ss	<< argv[4];
-					int kSize;
-					ss >> kSize;
-					ss << argv[3];
-					int convKernel;
-					ss >> convKernel;
-					options->convolutionKernelType = (ConvolutionKernel)convKernel;
-					options->kernelSize = kSize*kSize;
-					options->directoryPath = argv[5];
-					options->convolutionKernel = new int[options->kernelSize];
-				}
+			{
+				options->directoryPath = std::string(argv[3]);
+				validArguments = true;
+			}
+			else if(options->filterFlag == BLEND)
+			{
+				std::stringstream ss;
+				ss	<< std::string(argv[3]);
+				int blendValue;
+				ss >> blendValue;
+				options->blendMode = (BlendType)blendValue;
+				options->directoryPath = argv[4];	
+				validArguments = true;
+			}
+			else if(options->filterFlag == CONVOLUTION)
+			{
+				std::stringstream ss;
+				ss	<< argv[4];
+				int kSize;
+				ss >> kSize;
+				ss << argv[3];
+				int convKernel;
+				ss >> convKernel;
+				options->convolutionKernelType = (ConvolutionKernel)convKernel;
+				options->kernelSize = kSize*kSize;
+				options->directoryPath = argv[5];
+				options->convolutionKernel = new int[options->kernelSize];
+				validArguments = true;
 			}
 		}
+		std::cout << "directory: " << options->directoryPath << std::endl;
+		std::cout << "filter flag: " << options->filterFlag << std::endl;
 		return validArguments;
 	}
 

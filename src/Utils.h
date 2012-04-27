@@ -65,23 +65,32 @@ namespace gpu
 		INVERTBLEND,
 	};
 	
+	enum ConvolutionKernel
+	{
+		GAUSSIAN,
+		LAPLACIAN,
+		EMBOSSED,
+		MOTIONBLUR,
+		SHARPEN,
+	};
+
 	class Options
 	{
 		public:
 			gpu::FilterFlag filterFlag;
 			std::string directoryPath;
-			std::string convolutionKernelName;
+			ConvolutionKernel convolutionKernelType;
 			gpu::BlendType blendMode;
 			int* convolutionKernel;
 			int kernelSize;
 			
 			Options(FilterFlag filterFlag_,
 							std::string directoryPath_,
-							std::string convolutionKernelName_,
+							ConvolutionKernel convolutionKernelType_,
 							int kernelSize_)
 			:filterFlag(filterFlag_),
 	 		directoryPath(directoryPath_),
-		 	convolutionKernelName(convolutionKernelName_),
+		 	convolutionKernelType(convolutionKernelType_),
 	 		kernelSize(kernelSize_)
 			{
 				convolutionKernel = new int[kernelSize];
@@ -91,7 +100,7 @@ namespace gpu
 			{
 				filterFlag = options_.filterFlag;
 				directoryPath = options_.directoryPath;
-				convolutionKernelName = options_.convolutionKernelName;
+				convolutionKernelType = options_.convolutionKernelType;
 				std::copy(options_.convolutionKernel,
 									options_.convolutionKernel + options_.kernelSize,
 									convolutionKernel);
@@ -104,7 +113,7 @@ namespace gpu
 				{
 					filterFlag = options_.filterFlag;
 					directoryPath = options_.directoryPath;
-					convolutionKernelName = options_.convolutionKernelName;
+					convolutionKernelType = options_.convolutionKernelType;
 					int* newKernel = new int[options_.kernelSize];
 					std::copy(options_.convolutionKernel,
 										options_.convolutionKernel + options_.kernelSize,
@@ -120,11 +129,6 @@ namespace gpu
 			~Options(){delete[] convolutionKernel;}
 	};
 
-
-	static void readConvolutionKernel(Options* options)
-	{
-		//read JSON and populate convolution kernel.
-	}
 
 	static bool parseCommandLine(int argc, char* argv[], Options* options)
 	{
@@ -165,11 +169,13 @@ namespace gpu
 				 	ss	<< argv[4];
 					int kSize;
 					ss >> kSize;
-					options->convolutionKernelName = argv[3];
+					ss << argv[3];
+					int convKernel;
+					ss >> convKernel;
+					options->convolutionKernelType = (ConvolutionKernel)convKernel;
 					options->kernelSize = kSize*kSize;
 					options->directoryPath = argv[5];
 					options->convolutionKernel = new int[options->kernelSize];
-					readConvolutionKernel(options);
 				}
 			}
 		}

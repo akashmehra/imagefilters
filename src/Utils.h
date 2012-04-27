@@ -17,8 +17,165 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <cerrno> 
+#include <sstream>
+
 namespace gpu 
 {
+  enum FilterType
+  {
+    LUMINOUS_FILTER_CONTRAST, 
+    LUMINOUS_FILTER_BRIGHTNESS,
+    COLORSPACE_FILTER_SATURATION,
+    COLORSPACE_FILTER_SEPIA,
+  };
+  
+  enum BlendType
+ 	{
+		BLEND_FILTER_NORMAL,
+        BLEND_FILTER_LIGHTEN,
+        BLEND_FILTER_DARKEN,
+        BLEND_FILTER_MULTIPLY,
+        BLEND_FILTER_AVERAGE,
+        BLEND_FILTER_ADD,
+        BLEND_FILTER_SUBTRACT,
+        BLEND_FILTER_DIFFERENCE,
+        BLEND_FILTER_NEGATION,
+        BLEND_FILTER_SCREEN,
+        BLEND_FILTER_EXCLUSION,
+        BLEND_FILTER_OVERLAY,
+        BLEND_FILTER_SOFTLIGHT,
+        BLEND_FILTER_HARDLIGHT,
+        BLEND_FILTER_COLORDODGE,
+        BLEND_FILTER_COLORBURN,
+        BLEND_FILTER_LINEARDODGE,
+        BLEND_FILTER_LINEARBURN,
+        BLEND_FILTER_LINEARLIGHT,
+        BLEND_FILTER_VIVIDLIGHT,
+        BLEND_FILTER_PINLIGHT,
+        BLEND_FILTER_HARDMIX
+	 };
+	enum FilterFlag
+	{
+		BRIGHTNESS,
+		CONTRAST,
+		CONVOLUTION,
+		BLEND,
+		SATURATION,
+		SEPIA,
+		INVERTBLEND,
+	};
+	
+	class Options
+	{
+		public:
+			gpu::FilterFlag filterFlag;
+			std::string directoryPath;
+			std::string convolutionKernelName;
+			gpu::BlendType blendMode;
+			int* convolutionKernel;
+			int kernelSize;
+			
+			Options(FilterFlag filterFlag_,
+							std::string directoryPath_,
+							std::string convolutionKernelName_,
+							int kernelSize_)
+			:filterFlag(filterFlag_),
+	 		directoryPath(directoryPath_),
+		 	convolutionKernelName(convolutionKernelName_),
+	 		kernelSize(kernelSize_)
+			{
+				convolutionKernel = new int[kernelSize];
+			}
+
+			Options(const Options& options_)
+			{
+				filterFlag = options_.filterFlag;
+				directoryPath = options_.directoryPath;
+				convolutionKernelName = options_.convolutionKernelName;
+				std::copy(options_.convolutionKernel,
+									options_.convolutionKernel + options_.kernelSize,
+									convolutionKernel);
+				kernelSize = options_.kernelSize;
+			}
+
+			Options& operator= (const Options& options_)
+			{
+				if(this != &options_)
+				{
+					filterFlag = options_.filterFlag;
+					directoryPath = options_.directoryPath;
+					convolutionKernelName = options_.convolutionKernelName;
+					int* newKernel = new int[options_.kernelSize];
+					std::copy(options_.convolutionKernel,
+										options_.convolutionKernel + options_.kernelSize,
+										newKernel);
+					delete[] convolutionKernel;
+		  		convolutionKernel = newKernel;
+					kernelSize = options_.kernelSize;	
+				}
+				return *this;
+			}
+
+			Options(){}
+			~Options(){delete[] convolutionKernel;}
+	};
+
+
+	static void readConvolutionKernel(Options* options)
+	{
+		//read JSON and populate convolution kernel.
+	}
+
+	static bool parseCommandLine(int argc, char* argv[], Options* options)
+	{
+		bool validArguments = true;
+		for(int i = 1; i < argc; ++i)
+		{
+			if(argv[1] != "-filter")
+			{
+				validArguments = false;
+				break;
+			}
+			else
+			{
+				std::stringstream ss;
+			 	ss	<< std::string(argv[2]);
+				int value;
+				ss >> value;
+				options->filterFlag = (FilterFlag)value;
+				if(options->filterFlag == BRIGHTNESS
+					||options->filterFlag == SEPIA
+					|| options->filterFlag == CONTRAST
+					|| options->filterFlag == SATURATION)
+				{
+					options->directoryPath = std::string(argv[3]);
+				}
+				else if(options->filterFlag == BLEND)
+				{
+					std::stringstream ss;
+				 	ss	<< std::string(argv[3]);
+					int blendValue;
+					ss >> blendValue;
+					options->blendMode = (BlendType)blendValue;
+				 	options->directoryPath = argv[4];	
+				}
+				else if(options->filterFlag == CONVOLUTION)
+				{
+					std::stringstream ss;
+				 	ss	<< argv[4];
+					int kSize;
+					ss >> kSize;
+					options->convolutionKernelName = argv[3];
+					options->kernelSize = kSize*kSize;
+					options->directoryPath = argv[5];
+					options->convolutionKernel = new int[options->kernelSize];
+					readConvolutionKernel(options);
+				}
+			}
+		}
+		return validArguments;
+	}
+
 
 	static void readDirectory(std::string directoryPath,
 								 						std::vector<std::string>* fileList)

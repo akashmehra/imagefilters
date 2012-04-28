@@ -4,3 +4,11 @@
 imageprocessing/*
 imageprocessing/imageprocessing/*
 build/
+*.mp4
+*.ppt
+images/input/*
+src/tags
+*.gch
+src/gimage
+src/pimage
+src/pimg

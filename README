@@ -1,43 +1,51 @@
-Compilation Instructions:
-  Compiling C++ binaries:
-    If you don't have cmake installed then compile by issuing the following command:
-      g++ -o pimg processImage.cpp -O3 -L/usr/X11R6/lib -lm -lpthread -lX11 -DGCC_COMPILATION
+1) COMPILATION:
+   Compiling C++ binaries:
+     If you don't have cmake installed then compile by issuing the following
+command:
+     g++ -o pimg processImage.cpp -O3 -L/usr/X11R6/lib -lm -lpthread -lX11
+-DGCC_COMPILATION
 
-      else:
-        for building out of source:
-          In Release mode:
-            mkdir -p build/release
-            cd build/release
-            cmake -DCMAKE_BUILD_TYPE=Release ../../
-            make
-	
-          In Debug mode:
-            mkdir -p build/debug
-            cd build/debug
-            cmake ../../
-            make
+     else:
+        for building out of source:
+          In Release mode:
+            mkdir -p build/release
+            cd build/release
+            cmake -DCMAKE_BUILD_TYPE=Release ../../
+            make
 
-       For using Xcode:
-         cmake -GXcode ../../
+          In Debug mode:
+            mkdir -p build/debug
+            cd build/debug
+            cmake ../../
+            make
 
-  Compiling the cuda binaries:
-    To run the cuda code:
-	  nvcc -o gimage gpuProcessImage.cu -L/usr/X11R6/lib -lm -lpthread -lX11
+       For using Xcode:
+         cmake -GXcode ../../
 
+  Compiling the cuda binaries:
+    To run the cuda code:
+  nvcc -o gimage gpuProcessImage.cu -L/usr/X11R6/lib -lm -lpthread -lX11
 
-Running the Code:
+2) EXECUTION:
 
-  executablename -filter filterType [blendValue|convolutionkerneltype] [convolutionkernelsize] directorypath.
+executablename -filter filterType [blendValue|convolutionkerneltype] [convolutionkernelsize] directorypath.
 
   filterType: (these are all integers) 
-    BRIGHTNESS:0,
-    SEPIA:5,
-    CONTRAST:1,
-    SATURATION:4,
-    CONVOLUTION:2,
-    BLEND:3 
-  blendValue: 0-13, convolutionkerneltype 0-4
-  convolutionkernelsize 3,5,7 are common sizes.
+    BRIGHTNESS            : 0 
+    CONTRAST              : 1
+    CONVOLUTION           : 2
+    BLEND                 : 3
+    SATURATION            : 4
+    SEPIA                 : 5
+    BLACKWHITE            : 6
+    BRIGHTNESS_CONTRAST   : 7
+    BLACKWHITE_BRIGHTNESS : 8
+    BRIGHTNESS_SATURATION : 9
+    CONTRAST_SEPIA        : 10
+  
+  blendValue: 0-21, convolutionkerneltype 0-5
+  convolutionkernelsize: 3, we can change it to support 5, 7 etc. as well.
+
   directory where images are stored, output will be stored in the same directory under output directory: directoryPath/output/
 
   Brightness:
@@ -59,11 +67,42 @@ Running the Code:
     ./gimage -filter 2 3 3 ../images/input
     ./gimage -filter 2 4 3 ../images/input
 
-  For a detailed description on convolution filters please refer to a section on convolution in report.
+     GAUSSIAN          : 0
+     EMBOSSED          : 1
+     MOTIONBLUR        : 2
+     SHARPEN           : 3
+     EDGEDETECTION     : 4
+     EDGEENHANCE       : 5
 
-  Blend:
-    ./gimage -filter 3 0 ../images/input
-    ./gimage -filter 3 b ../images/input
-  b can go until 13 blend modes. 
-  
-  For a detailed description about blend modes please refer to a section on Blend modes in report.
+
+    For a detail description of convolution filters please refer to a section on convolution in report.
+
+    Blend:
+      ./gimage -filter 3 0 ../images/input
+
+      BLEND_FILTER_NORMAL        : 0
+      BLEND_FILTER_LIGHTEN       : 1
+      BLEND_FILTER_DARKEN        : 2
+      BLEND_FILTER_MULTIPLY      : 3
+      BLEND_FILTER_AVERAGE       : 4
+      BLEND_FILTER_ADD           : 5
+      BLEND_FILTER_SUBTRACT      : 6
+      BLEND_FILTER_DIFFERENCE    : 7
+      BLEND_FILTER_NEGATION      : 8
+      BLEND_FILTER_SCREEN        : 9
+      BLEND_FILTER_EXCLUSION     : 10
+      BLEND_FILTER_OVERLAY       : 11
+      BLEND_FILTER_SOFTLIGHT     : 12
+      BLEND_FILTER_HARDLIGHT     : 13
+      BLEND_FILTER_COLORDODGE    : 14
+      BLEND_FILTER_COLORBURN     : 15
+      BLEND_FILTER_LINEARDODGE   : 16
+      BLEND_FILTER_LINEARBURN    : 17
+      BLEND_FILTER_LINEARLIGHT   : 18
+      BLEND_FILTER_VIVIDLIGHT    : 19
+      BLEND_FILTER_PINLIGHT      : 20
+      BLEND_FILTER_HARDMIX       : 21
+
+
+
+      We can issue upto 21 for Blend for blend modes. For detail description of blend modes please refer to a section on Blend modes in report.

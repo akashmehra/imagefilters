@@ -121,7 +121,7 @@ namespace gpu
         /**
          * Colorspace filter type bw
          * */
-        FUNCTION_PREFIX void BlackNWhite(T &pixelR,
+        FUNCTION_PREFIX void blackNWhite(T &pixelR,
                                          T &pixelG,
                                          T &pixelB,
                                          T &pixelOutputR,
@@ -174,6 +174,9 @@ namespace gpu
               pixelOutputG, 
               pixelOutputB);
         break;
+      case COLORSPACE_FILTER_BW:
+        blackNWhite(pixelR,
+                    pixelG,pixelB,pixelOutputR,pixelOutputG,pixelOutputB);
       }
     }
 
@@ -254,7 +257,7 @@ namespace gpu
     }
 
   template<typename T>
-    FUNCTION_PREFIX void ColorSpaceFilters<T>::BlackNWhite(T &pixelR,T &pixelG, 
+    FUNCTION_PREFIX void ColorSpaceFilters<T>::blackNWhite(T &pixelR,T &pixelG, 
                                                            T &pixelB,T &pixelOutputR,
                                                            T& pixelOutputG,T& pixelOutputB)
     {

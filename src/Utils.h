@@ -27,6 +27,7 @@ namespace gpu
     LUMINOUS_FILTER_BRIGHTNESS,
     COLORSPACE_FILTER_SATURATION,
     COLORSPACE_FILTER_SEPIA,
+    COLORSPACE_FILTER_BW,
   };
 
   enum BlendType
@@ -62,7 +63,11 @@ namespace gpu
     BLEND,
     SATURATION,
     SEPIA,
-    INVERTBLEND,
+    BLACKWHITE,
+    BRIGHTNESS_CONTRAST,
+    BLACKWHITE_BRIGHTNESS,
+    BRIGHTNESS_SATURATION,
+    CONTRAST_SEPIA,
   };
 
   enum ConvolutionKernel
@@ -226,7 +231,13 @@ namespace gpu
         if(options->filterFlag == BRIGHTNESS
            ||options->filterFlag == SEPIA
            || options->filterFlag == CONTRAST
-           || options->filterFlag == SATURATION)
+           || options->filterFlag == SATURATION
+           || options->filterFlag == BLACKWHITE 
+           || options->filterFlag == BLACKWHITE_BRIGHTNESS 
+           || options->filterFlag == BRIGHTNESS_CONTRAST
+           || options->filterFlag == BRIGHTNESS_SATURATION
+           || options->filterFlag == CONTRAST_SEPIA
+          )
         {
           options->directoryPath = std::string(argv[3]);
           validArguments = true;

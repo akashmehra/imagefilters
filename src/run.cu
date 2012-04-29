@@ -162,6 +162,35 @@ int main(int argc, char* argv[])
           runSepiaKernel(setup,d_data,d_result,
                          width,height,channels,offset);
           break;
+        case gpu::BLACKWHITE:
+					std::cout << "black n  white kernel----------" <<std::endl;
+          runBWKernel(setup,d_data,d_result,
+                         width,height,channels,offset);
+          break;
+        case gpu::BRIGHTNESS_CONTRAST:
+          runBrightnessKernel(setup,d_data,d_result,
+                              width,height,channels,offset);
+          runContrastKernel(setup,d_result,d_result,
+                            width,height,channels,offset);
+          break;  
+        case gpu::BLACKWHITE_BRIGHTNESS:
+          runBWKernel(setup,d_data,d_result,
+                         width,height,channels,offset);
+          runContrastKernel(setup,d_result,d_result,
+                            width,height,channels,offset);
+          break;  
+        case gpu::BRIGHTNESS_SATURATION:
+          runBrightnessKernel(setup,d_data,d_result,
+                              width,height,channels,offset);
+          runSaturationKernel(setup,d_result,d_result,
+                              width,height,channels,offset);
+          break;  
+        case gpu::CONTRAST_SEPIA:
+          runContrastKernel(setup,d_data,d_result,
+                            width,height,channels,offset);
+          runSepiaKernel(setup,d_result,d_result,
+                         width,height,channels,offset);
+          break;  
         }
         dTime2 = gpu::getTime(tim);
         executionTime += dTime2 - dTime1;

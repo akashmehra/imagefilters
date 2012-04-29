@@ -74,6 +74,15 @@ void runSepiaKernel(const gpu::Setup& setup,
 
 }
 
+void runBWKernel(const gpu::Setup& setup,
+                    unsigned char* d_data, unsigned char* d_result,
+                    int width, int height, int channels, int offset)
+{
+  callLumAndColorKernel<unsigned char>(colorspaceFilterKernel,setup.blocks,setup.threads,
+                                       d_data,d_result,width,height,channels,offset,
+                                       0.0f,gpu::COLORSPACE_FILTER_BW);
+
+}
 
 void runSaturationKernel(const gpu::Setup& setup,
                          unsigned char* d_data, unsigned char* d_result,

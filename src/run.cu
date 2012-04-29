@@ -118,53 +118,48 @@ int main(int argc, char* argv[])
         dTime1 = gpu::getTime(tim);
         std::cout << "Begining execution on GPU." << std::endl;
         int offset = width*height;
-        switch(options.filterFlag)
+        std::cout << "Applying Convolution Filter..." << std::endl;
+       	int h_kernel[] = {-1,-1,-1,-1,9,-1,-1,-1,-1};
+        int sizeKernel = sizeof(h_kernel)/sizeof(*h_kernel);
+        int windowSize = static_cast<int>(sqrt(sizeKernel));
+        int* d_kernel;
+        cudaMalloc((void**)&d_kernel,windowSize);
+        cudaMemcpy(d_kernel,h_kernel,windowSize,cudaMemcpyHostToDevice);
+        
+				switch(options.filterFlag)
         {									
 
-          /*
-             case BRIGHTNESS:
-             runBrightnessKernel(setup,d_data,d_result,h_result,
-             width,height,channels,offset);
-             break;
+        case gpu::BRIGHTNESS:
+          runBrightnessKernel(setup,d_data,d_result,
+                              width,height,channels,offset);
+          break;
 
-             case CONTRAST:
-             runContrastKernel(setup,d_data,d_result,h_result,
-             width,height,channels,offset);
-             break;
-           */
-
+        case gpu::CONTRAST:
+          runContrastKernel(setup,d_data,d_result,
+                            width,height,channels,offset);
+          break;
 
         case gpu::CONVOLUTION:
-          std::cout << "Applying Convolution Filter..." << std::endl;
-          int h_kernel[] = {-1,-1,-1,-1,9,-1,-1,-1,-1};
-          int sizeKernel = sizeof(h_kernel)/sizeof(*h_kernel);
-          int windowSize = static_cast<int>(sqrt(sizeKernel));
-          int* d_kernel;
-          cudaMalloc((void**)&d_kernel,windowSize);
-          cudaMemcpy(d_kernel,h_kernel,windowSize,cudaMemcpyHostToDevice);
-          runConvolutionKernel(setup,d_data,d_result,h_result,
-                               d_kernel,windowSize,
-                               width,height,channels,offset);
-          cudaFree(d_kernel);
-          break;
-          /*
-             case BLEND:
-             runBlendKernel(setup,d_data,d_result,h_result,
-             width,height,channels,offset);
+            runConvolutionKernel(setup,d_data,d_result,
+                                 d_kernel,windowSize,
+                                 width,height,channels,offset);
+            break;
+        
+        case gpu::BLEND:
+            runBlendKernel(setup,d_data,d_data,d_result,
+                           width,height,channels,offset,1.2f,options.blendMode);
 
-             break;
+            break;
 
-             case SATURATION:
-             runSaturationKernel(setup,d_data,d_result,h_result,
-             width,height,channels,offset);
-             break;
+        case gpu::SATURATION:
+            runSaturationKernel(setup,d_data,d_result,
+                                width,height,channels,offset);
+            break;
 
-             case SEPIA:
-             runSepiaKernel(setup,d_data,d_result,h_result,
-             width,height,channels,offset);
-             break;
-           */
-
+        case gpu::SEPIA:
+            runSepiaKernel(setup,d_data,d_result,
+                           width,height,channels,offset);
+            break;
         }
         dTime2 = gpu::getTime(tim);
         executionTime += dTime2 - dTime1;
@@ -174,6 +169,7 @@ int main(int argc, char* argv[])
         cudaMemcpy(h_result,d_result,sizeResult,cudaMemcpyDeviceToHost);
         cudaFree(d_data);
         cudaFree(d_result);
+        cudaFree(d_kernel);
 
         dTime2 = gpu::getTime(tim);
         configurationTime += dTime2 - dTime1;

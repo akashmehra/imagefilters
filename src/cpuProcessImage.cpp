@@ -97,38 +97,38 @@ int main(int argc, char* argv[])
                 break;
 
         case gpu::CONTRAST:
-                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_CONTRAST);
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.5,LUMINOUS_FILTER_CONTRAST);
                 break;
         case gpu::CONVOLUTION:
                 ip.applyConvolution(h_data,h_result,options.convolutionKernel,width,height,channels,options.kernelSize,0);
                 break;
         case gpu::BLEND:
-                ip.applyBlendFilter(h_data,h_data,h_result, width,height,channels,1.2f,options.blendMode);
+                ip.applyBlendFilter(h_data,h_data,h_result, width,height,channels,1.0f,options.blendMode);
                 break;
         case gpu::SATURATION:
-                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_SATURATION);
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,50.2f,COLORSPACE_FILTER_SATURATION);
                 break;
         case gpu::SEPIA:
-                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_SEPIA);
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,0,COLORSPACE_FILTER_SEPIA);
                 break;
         case gpu::BLACKWHITE:
-                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_BW);
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,0,COLORSPACE_FILTER_BW);
                 break;
         case gpu::BRIGHTNESS_CONTRAST:
-                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_BRIGHTNESS);
-                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_CONTRAST);
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2f,LUMINOUS_FILTER_BRIGHTNESS);
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.5f,LUMINOUS_FILTER_CONTRAST);
                 break;
         case gpu::BLACKWHITE_BRIGHTNESS:
-                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_BW);
-                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_BRIGHTNESS);
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,0,COLORSPACE_FILTER_BW);
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2f,LUMINOUS_FILTER_BRIGHTNESS);
                 break;
         case gpu::BRIGHTNESS_SATURATION:
-                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_BRIGHTNESS);
-                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_SATURATION);
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2f,LUMINOUS_FILTER_BRIGHTNESS);
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,50.2f,COLORSPACE_FILTER_SATURATION);
                 break;
         case gpu::CONTRAST_SEPIA:
-                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_BRIGHTNESS);
-                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_SEPIA);
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2f,LUMINOUS_FILTER_BRIGHTNESS);
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,0.0f,COLORSPACE_FILTER_SEPIA);
                 break;
         }
         dTime2 = gpu::getTime(tim);

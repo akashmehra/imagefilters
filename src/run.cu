@@ -9,12 +9,12 @@
 #include "gpuProcessImage.cu"
 #include "Utils.h"
 #include "cpuProcessImage.h"
-
+#include "Constants.h"
 
 int main(int argc, char* argv[])
 {
 
-	std::cout << "-------------------RUNNING IMAGE FILTERS APP ON GPU---------------------------" << std::endl;
+  std::cout << "-------------------RUNNING IMAGE FILTERS APP ON GPU---------------------------" << std::endl;
   gpu::Options options;
   bool validArguments	= parseCommandLine(argc, argv, &options);	 
   if(validArguments)
@@ -69,8 +69,8 @@ int main(int argc, char* argv[])
         fileIOTime += dTime2 - dTime1;
 
         std::cout << "Time taken to read from disk:  " << dTime2 - dTime1 << std::endl;
-        
-				dTime1 = gpu::getTime(tim);
+
+        dTime1 = gpu::getTime(tim);
         std::cout << "Unrolling Image and setting up blocks and threads." << std::endl;
         int width = image.width();
         int height = image.height();
@@ -119,15 +119,16 @@ int main(int argc, char* argv[])
         dTime1 = gpu::getTime(tim);
         std::cout << "Begining execution on GPU." << std::endl;
         int offset = width*height;
-        std::cout << "Applying Convolution Filter..." << std::endl;
-       	int h_kernel[] = {-1,-1,-1,-1,9,-1,-1,-1,-1};
-        int sizeKernel = sizeof(h_kernel)/sizeof(*h_kernel);
-        int windowSize = static_cast<int>(sqrt(sizeKernel));
+        std::cout << "Applying Filter..." << std::endl;
+
         int* d_kernel;
-        cudaMalloc((void**)&d_kernel,windowSize);
-        cudaMemcpy(d_kernel,h_kernel,windowSize,cudaMemcpyHostToDevice);
-        
-				switch(options.filterFlag)
+        std::cout << "filter size: " << options.kernelSize << std::endl;	
+        if(options.isConvolutionOp)
+        {
+          cudaMalloc((void**)&d_kernel,options.kernelSize*options.kernelSize*sizeof(int));
+          cudaMemcpy(d_kernel,options.convolutionKernel,options.kernelSize*options.kernelSize*sizeof(int),cudaMemcpyHostToDevice);
+        }
+        switch(options.filterFlag)
         {									
 
         case gpu::BRIGHTNESS:
@@ -141,26 +142,26 @@ int main(int argc, char* argv[])
           break;
 
         case gpu::CONVOLUTION:
-            runConvolutionKernel(setup,d_data,d_result,
-                                 d_kernel,windowSize,
-                                 width,height,channels,offset);
-            break;
-        
-        case gpu::BLEND:
-            runBlendKernel(setup,d_data,d_data,d_result,
-                           width,height,channels,offset,1.2f,options.blendMode);
+          runConvolutionKernel(setup,d_data,d_result,
+                               d_kernel,options.kernelSize,
+                               width,height,channels,offset);
+          break;
 
-            break;
+        case gpu::BLEND:
+          runBlendKernel(setup,d_data,d_data,d_result,
+                         width,height,channels,offset,1.2f,options.blendMode);
+
+          break;
 
         case gpu::SATURATION:
-            runSaturationKernel(setup,d_data,d_result,
-                                width,height,channels,offset);
-            break;
+          runSaturationKernel(setup,d_data,d_result,
+                              width,height,channels,offset);
+          break;
 
         case gpu::SEPIA:
-            runSepiaKernel(setup,d_data,d_result,
-                           width,height,channels,offset);
-            break;
+          runSepiaKernel(setup,d_data,d_result,
+                         width,height,channels,offset);
+          break;
         }
         dTime2 = gpu::getTime(tim);
         executionTime += dTime2 - dTime1;
@@ -170,7 +171,10 @@ int main(int argc, char* argv[])
         cudaMemcpy(h_result,d_result,sizeResult,cudaMemcpyDeviceToHost);
         cudaFree(d_data);
         cudaFree(d_result);
-        cudaFree(d_kernel);
+        if(options.isConvolutionOp)
+        {
+          cudaFree(d_kernel);
+        }
 
         dTime2 = gpu::getTime(tim);
         configurationTime += dTime2 - dTime1;
@@ -215,6 +219,7 @@ int main(int argc, char* argv[])
   else
   {
     std::cout << "Usage: " << argv[0] << " -filter [optional] <image-directory>" << std::endl;
+    std::cout << "ERROR: " << options.errorMessage << std::endl;
   }
-	std::cout << "---------------------ENDING IMAGE APP ON GPU--------------------------------------" << std::endl;
+  std::cout << "---------------------ENDING IMAGE APP ON GPU--------------------------------------" << std::endl;
 }

@@ -1,6 +1,6 @@
 #include <ctime>
 #include <cmath>
-
+#include <iostream>
 #include "gpuUtils.cu"
 #include "gpuKernels.cu"
 #include "cpuProcessImage.h"
@@ -32,6 +32,7 @@ void callConvolutionKernel(void(*kernel)(T*,T*,int*,
 {
   dim3 dimGrid(blocks,1,1);
   dim3 dimBlock(threads,1,1);
+	std::cout << "CONVOLUTION KERNEL" << std::endl;
   kernel<<<dimGrid,dimBlock>>>(inputBuffer, outputBuffer,convKernel, 
 															 width, height, kernelSize, normal,
 															 offset); 

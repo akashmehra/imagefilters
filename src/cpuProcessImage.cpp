@@ -99,20 +99,35 @@ int main(int argc, char* argv[])
         case gpu::CONTRAST:
                 ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_CONTRAST);
                 break;
-          break;
-
         case gpu::CONVOLUTION:
-                ip.applyConvolution(h_data,h_result,h_kernel,width,height,channels,windowSize,0);
+                ip.applyConvolution(h_data,h_result,options.convolutionKernel,width,height,channels,options.kernelSize,0);
                 break;
         case gpu::BLEND:
                 ip.applyBlendFilter(h_data,h_data,h_result, width,height,channels,1.2f,options.blendMode);
-          break;
-
+                break;
         case gpu::SATURATION:
                 ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_SATURATION);
                 break;
-
         case gpu::SEPIA:
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_SEPIA);
+                break;
+        case gpu::BLACKWHITE:
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_BW);
+                break;
+        case gpu::BRIGHTNESS_CONTRAST:
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_BRIGHTNESS);
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_CONTRAST);
+                break;
+        case gpu::BLACKWHITE_BRIGHTNESS:
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_BW);
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_BRIGHTNESS);
+                break;
+        case gpu::BRIGHTNESS_SATURATION:
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_BRIGHTNESS);
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_SATURATION);
+                break;
+        case gpu::CONTRAST_SEPIA:
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_BRIGHTNESS);
                 ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_SEPIA);
                 break;
         }

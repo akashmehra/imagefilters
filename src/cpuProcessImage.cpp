@@ -87,11 +87,7 @@ int main(int argc, char* argv[])
 
         std::cout << "Done configuring the problem.\nTime taken: " << dTime2 - dTime1 << std::endl;
 
-        int h_kernel[] = {-1,-1,-1,-1,9,-1,-1,-1,-1};
-        int sizeKernel = sizeof(h_kernel)/sizeof(*h_kernel);
-        int windowSize = static_cast<int>(sqrt(sizeKernel));
-        //gpu::Setup setup;
-        //startSetup(width, height, channels,&problemSize, &sizeData, &sizeResult, &setup);
+        dTime1 = gpu::getTime(tim);
         ImageProcessing <unsigned char>ip;
         switch(options.filterFlag)
         {									
@@ -157,7 +153,7 @@ int main(int argc, char* argv[])
     std::cout << "File I/O time: " << fileIOTime << std::endl;
     std::cout << "Configuration time: " << configurationTime << std::endl;
     std::cout << "Execution time: " << executionTime << std::endl;
-    std::cout << "GPU Utilization: " << (double)executionTime/(fileIOTime+configurationTime+executionTime) << std::endl;
+    std::cout << "CPU Utilization: " << (double)executionTime/(fileIOTime+configurationTime+executionTime) << std::endl;
   }
   else
   {

@@ -14,6 +14,7 @@
 int main(int argc, char* argv[])
 {
 
+	std::cout << "-------------------RUNNING IMAGE FILTERS APP ON GPU---------------------------" << std::endl;
   gpu::Options options;
   bool validArguments	= parseCommandLine(argc, argv, &options);	 
   if(validArguments)
@@ -61,15 +62,15 @@ int main(int argc, char* argv[])
 
         std::string outputFilename = imageFilename.substr(indexOfSlash,
                                                           imageFilename.length()-4-indexOfSlash);
+
+        CImg<unsigned char> image(imageFilename.c_str());
+
         dTime2 = gpu::getTime(tim);
         fileIOTime += dTime2 - dTime1;
 
         std::cout << "Time taken to read from disk:  " << dTime2 - dTime1 << std::endl;
-
-
-        dTime1 = gpu::getTime(tim);
-        CImg<unsigned char> image(imageFilename.c_str());
-
+        
+				dTime1 = gpu::getTime(tim);
         std::cout << "Unrolling Image and setting up blocks and threads." << std::endl;
         int width = image.width();
         int height = image.height();
@@ -215,4 +216,5 @@ int main(int argc, char* argv[])
   {
     std::cout << "Usage: " << argv[0] << " -filter [optional] <image-directory>" << std::endl;
   }
+	std::cout << "---------------------ENDING IMAGE APP ON GPU--------------------------------------" << std::endl;
 }

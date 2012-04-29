@@ -132,6 +132,12 @@ namespace gpu
 
 static bool parseCommandLine(int argc, char* argv[], Options* options)
 {
+  // executablename -filter filterType [blendValue|convolutionkerneltype] [convolutionkernelsize] directorypath.
+  // filterType: BRIGHTNESS:0, SEPIA:5, CONTRAST:1, SATURATION:4, CONVOLUTION:2, BLEND:3, these are all integers.
+  // blendValue: 0-13, convolutionkerneltype 0-4
+  // convolutionkernelsize 3,5,7 are common sizes.
+  // directory where images are stored, output will be stored in the same directory under output directory: directoryPath/output/
+
   bool validArguments = false;
   std::cout << argv[1] << std::endl;
   std::string str(argv[1]);

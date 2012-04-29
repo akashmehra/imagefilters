@@ -1,27 +1,69 @@
-If you don't have cmake installed then compile by issuing the following command:
-	g++ -o pimg processImage.cpp -O3 -L/usr/X11R6/lib -lm -lpthread -lX11 -DGCC_COMPILATION
+Compilation Instructions:
+  Compiling C++ binaries:
+    If you don't have cmake installed then compile by issuing the following command:
+      g++ -o pimg processImage.cpp -O3 -L/usr/X11R6/lib -lm -lpthread -lX11 -DGCC_COMPILATION
 
-else:
-	for building out of source:
-	In Release mode:
-		mkdir -p build/release
-		cd build/release
-		cmake -DCMAKE_BUILD_TYPE=Release ../../
-		make
+      else:
+        for building out of source:
+          In Release mode:
+            mkdir -p build/release
+            cd build/release
+            cmake -DCMAKE_BUILD_TYPE=Release ../../
+            make
 	
-	In Debug mode:
-		mkdir -p build/debug
-		cd build/debug
-		cmake ../../
-		make
+          In Debug mode:
+            mkdir -p build/debug
+            cd build/debug
+            cmake ../../
+            make
 
-For using Xcode:
-	cmake -GXcode ../../
+       For using Xcode:
+         cmake -GXcode ../../
 
-but have to test if it works with Xcode just like that.
+  Compiling the cuda binaries:
+    To run the cuda code:
+	  nvcc -o gimage gpuProcessImage.cu -L/usr/X11R6/lib -lm -lpthread -lX11
 
 
-To run the cuda code:
-	nvcc -o gpuimg gpuProcessImage.cu -L/usr/X11R6/lib -lm -lpthread -lX11
+Running the Code:
 
-TODO: Prepare a test plan for code profiling after implementing convolution on GPU and canny edge.
+  executablename -filter filterType [blendValue|convolutionkerneltype] [convolutionkernelsize] directorypath.
+
+  filterType: (these are all integers) 
+    BRIGHTNESS:0,
+    SEPIA:5,
+    CONTRAST:1,
+    SATURATION:4,
+    CONVOLUTION:2,
+    BLEND:3 
+  blendValue: 0-13, convolutionkerneltype 0-4
+  convolutionkernelsize 3,5,7 are common sizes.
+  directory where images are stored, output will be stored in the same directory under output directory: directoryPath/output/
+
+  Brightness:
+    ./gimage -filter 0 ../images/input
+  
+  Contrast:
+    ./gimage -filter 1 ../images/input
+  
+  Saturation:
+    ./gimage -filter 4 ../images/input
+  
+  Sepia:  
+    ./gimage -filter 5 ../images/input
+
+  Convolution:
+    ./gimage -filter 2 0 3 ../images/input
+    ./gimage -filter 2 1 3 ../images/input
+    ./gimage -filter 2 2 3 ../images/input
+    ./gimage -filter 2 3 3 ../images/input
+    ./gimage -filter 2 4 3 ../images/input
+
+  For a detailed description on convolution filters please refer to a section on convolution in report.
+
+  Blend:
+    ./gimage -filter 3 0 ../images/input
+    ./gimage -filter 3 b ../images/input
+  b can go until 13 blend modes. 
+  
+  For a detailed description about blend modes please refer to a section on Blend modes in report.

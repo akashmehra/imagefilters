@@ -11,13 +11,13 @@
 #include "Utils.h"
 
 using namespace cimg_library;
-
+using namespace gpu;
 
 int main(int argc, char* argv[])
 {
   std::cout << "-------------------RUNNING IMAGE FILTERS APP ON GPU---------------------------" << std::endl;
   gpu::Options options;                                                                                                  
-  bool validArguments	= parseCommandLine(argc, argv, &options);	                                                       
+  bool validArguments	= parseCommandLine(argc, argv, &options);
   if(validArguments)                                                                                                     
   {                                                                                                                      
     std::vector<std::string> fileList;                                                                                   
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     double configurationTime = 0.0;
 
     double executionTime = 0.0;                                                                                          
-
+    double dTime1,dTime2,dTime3;
     for(;it != fileList.end();++it)                                                                                      
     {                                                                                                                    
       std::string imageFilename = directoryPath+*it;                                                                     
@@ -90,41 +90,35 @@ int main(int argc, char* argv[])
         int h_kernel[] = {-1,-1,-1,-1,9,-1,-1,-1,-1};
         int sizeKernel = sizeof(h_kernel)/sizeof(*h_kernel);
         int windowSize = static_cast<int>(sqrt(sizeKernel));
-
+        //gpu::Setup setup;
+        //startSetup(width, height, channels,&problemSize, &sizeData, &sizeResult, &setup);
+        ImageProcessing <unsigned char>ip;
         switch(options.filterFlag)
         {									
 
         case gpu::BRIGHTNESS:
-          runBrightnessKernel(setup,d_data,d_result,
-                              width,height,channels,offset);
-          break;
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_BRIGHTNESS);
+                break;
 
         case gpu::CONTRAST:
-          runContrastKernel(setup,d_data,d_result,
-                            width,height,channels,offset);
+                ip.applyLuminousFilter(h_data,h_result,width,height,channels,1.2,LUMINOUS_FILTER_CONTRAST);
+                break;
           break;
 
         case gpu::CONVOLUTION:
-          runConvolutionKernel(setup,d_data,d_result,
-                               d_kernel,windowSize,
-                               width,height,channels,offset);
-          break;
-
+                ip.applyConvolution(h_data,h_result,h_kernel,width,height,channels,windowSize,0);
+                break;
         case gpu::BLEND:
-          runBlendKernel(setup,d_data,d_data,d_result,
-                         width,height,channels,offset,1.2f,options.blendMode);
-
+                ip.applyBlendFilter(h_data,h_data,h_result, width,height,channels,1.2f,options.blendMode);
           break;
 
         case gpu::SATURATION:
-          runSaturationKernel(setup,d_data,d_result,
-                              width,height,channels,offset);
-          break;
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_SATURATION);
+                break;
 
         case gpu::SEPIA:
-          runSepiaKernel(setup,d_data,d_result,
-                         width,height,channels,offset);
-          break;
+                ip.applyColorSpaceFilter(h_data,h_result, width,height,channels,1.2f,COLORSPACE_FILTER_SEPIA);
+                break;
         }
         dTime2 = gpu::getTime(tim);
         executionTime += dTime2 - dTime1;

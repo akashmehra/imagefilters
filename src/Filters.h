@@ -278,18 +278,20 @@ namespace gpu
        * BW filter is basically 0.6*R + 0.35*G + 0.5*B
        * sepia we basically add some in RedChannel, and siginficantly less in Green Channel
        * */
-      float temp = 1.25 * pixelR;
+      float value = 0.6*pixelR + 0.35*pixelG + 0.05*pixelB;
+      //pixelOutputR=pixelOutputG=pixelOutputB=value;
+
+			float temp = 1.25 * value;
       PIXEL_DOMAIN_CHECK(temp);
       pixelOutputR = temp;
 
-      temp = 1.05 * pixelG;
+      temp = 1.05 * value;
       PIXEL_DOMAIN_CHECK(temp);
       pixelOutputG = temp;
 
-      temp = 1.25 * pixelB;
+      temp = 1.25 * value;
       PIXEL_DOMAIN_CHECK(temp);
       pixelOutputB = temp;
-
     }
 
   // ColorSpace Filters End.

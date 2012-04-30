@@ -88,7 +88,7 @@ namespace gpu
 
   static void initSharpenKernel(int* kernel,int size)
   {
-    int sharpenKernel[] = {0,-1,0,-1,5,-1,0,-1,0};
+    int sharpenKernel[] = {-1,-1,-1,-1,9,-1,-1,-1,-1};
     std::copy(sharpenKernel,sharpenKernel+size,kernel);
   }
 
